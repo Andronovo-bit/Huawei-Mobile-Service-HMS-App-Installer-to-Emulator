@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31611.283
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuaweiHMSInstaller", "HuaweiHMSInstaller.csproj", "{01E1E3D5-C19E-42EB-BF4F-CCE2166A7D33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "HuaweiHMSInstaller", "src\HuaweiHMSInstaller.csproj", "{01E1E3D5-C19E-42EB-BF4F-CCE2166A7D33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HmsInstallerTest", "HmsInstallerTest\HmsInstallerTest.csproj", "{A2E839DE-21FC-4B02-8C33-3E7F33DCD6EF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,6 +19,10 @@ Global
 		{01E1E3D5-C19E-42EB-BF4F-CCE2166A7D33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01E1E3D5-C19E-42EB-BF4F-CCE2166A7D33}.Release|Any CPU.Build.0 = Release|Any CPU
 		{01E1E3D5-C19E-42EB-BF4F-CCE2166A7D33}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{A2E839DE-21FC-4B02-8C33-3E7F33DCD6EF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2E839DE-21FC-4B02-8C33-3E7F33DCD6EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2E839DE-21FC-4B02-8C33-3E7F33DCD6EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2E839DE-21FC-4B02-8C33-3E7F33DCD6EF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
