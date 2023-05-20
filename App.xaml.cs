@@ -1,4 +1,6 @@
-﻿namespace HuaweiHMSInstaller;
+﻿using HuaweiHMSInstaller.Pages;
+
+namespace HuaweiHMSInstaller;
 
 public partial class App : Application
 {
@@ -7,5 +9,8 @@ public partial class App : Application
 		InitializeComponent();
 
 		MainPage = new AppShell();
-	}
+        Routing.RegisterRoute(nameof(DownloadandInstallPage), typeof(DownloadandInstallPage));
+        Routing.RegisterRoute(nameof(ThanksPage), typeof(ThanksPage));
+
+    }
 }

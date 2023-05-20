@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:v="clr-namespace:HuaweiHMSInstaller.Views"
+             Title="Huawei Emulator Installer"
+             BackgroundImageSource="huawei_background.png"
+             x:Class="HuaweiHMSInstaller.Pages.ThanksPage">
+    <Grid>
+        <VerticalStackLayout
+                Spacing="0"
+                Padding="0"
+                VerticalOptions="Center">
+
+            <Label 
+                    x:Name="TitleWelcome"
+                    Text="Thanks for the Installing"
+                    FontSize="Header"
+                    FontAttributes="None"
+                    TextColor="White"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Margin="0,0,0,0"/>
+
+            <!-- Use auto sizing for the label height and width -->
+            <Label 
+                    x:Name="TitleEmulator"
+                    Text="Huawei Emulator Enviroment"
+                    FontSize="Header"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    Margin="0,0,0,0"/>
+
+            <!-- Add more elements here as needed -->
+
+        </VerticalStackLayout>
+
+
+        <Grid
+            Padding="0"
+            BackgroundColor="#17181d"
+            VerticalOptions="End">
+            <Label 
+                    x:Name="VersionNum"
+                    Text="Step 2"
+                    FontSize="Medium"
+                    FontAttributes="None"
+                    TextColor="#7f8895"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    Margin="10,0,0,0"/>
+
+            <Button
+                x:Name="ButtonInstall"
+                Text="Finish"
+                FontSize="Default"
+                FontAttributes="Bold"
+                TextColor="#32191e"
+                BackgroundColor="#ed1c24"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                Margin="10,10,10,10"
+                Clicked="OnInstallButtonClicked">
+                <Button.ImageSource>
+                    <FontImageSource
+                            FontFamily="FontAwesome"
+                            Size="Large"
+                            Color="White"/>
+                </Button.ImageSource>
+            </Button>
+
+            <!-- Add more elements here as needed -->
+
+        </Grid>
+
+
+    </Grid>
+
+</ContentPage>
