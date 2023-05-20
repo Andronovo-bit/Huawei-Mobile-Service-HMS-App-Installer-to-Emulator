@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:v="clr-namespace:HuaweiHMSInstaller.Views"
+             xmlns:popup ="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
              x:Class="HuaweiHMSInstaller.Pages.ThanksPage">
@@ -50,31 +50,35 @@
                     HorizontalOptions="Start"
                     VerticalOptions="Center"
                     Margin="10,0,0,0"/>
-
-            <Button
+            <StackLayout x:Name="stackLayout">
+                <Button
                 x:Name="ButtonInstall"
                 Text="Finish"
                 FontSize="Default"
                 FontAttributes="Bold"
-                TextColor="#32191e"
+                TextColor="NavajoWhite"
                 BackgroundColor="#ed1c24"
                 HorizontalOptions="End"
                 VerticalOptions="Center"
                 Margin="10,10,10,10"
-                Clicked="OnInstallButtonClicked">
-                <Button.ImageSource>
-                    <FontImageSource
+                Clicked="OnFinishButtonClicked">
+                    <Button.ImageSource>
+                        <FontImageSource
                             FontFamily="FontAwesome"
                             Size="Large"
                             Color="White"/>
-                </Button.ImageSource>
-            </Button>
+                    </Button.ImageSource>
+                </Button>
+                <!--<popup:SfPopup x:Name="popup" />-->
+
+            </StackLayout>
+
 
             <!-- Add more elements here as needed -->
-
+           
         </Grid>
 
-
     </Grid>
+    
 
 </ContentPage>
