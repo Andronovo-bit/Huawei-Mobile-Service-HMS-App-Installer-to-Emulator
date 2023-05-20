@@ -2,13 +2,13 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:v="clr-namespace:HuaweiHMSInstaller.Views"
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
              x:Class="HuaweiHMSInstaller.MainPage">
 
     <ContentView>
-        
+
+
         <Grid x:Name="MainContentViewArea">
 
             <!-- Use a vertical stack layout to arrange the elements -->
@@ -43,41 +43,43 @@
                 </VerticalStackLayout>
 
                 <Grid
-            Padding="0"
-            BackgroundColor="#17181d"
-            VerticalOptions="End">
-                    <Label 
-                    x:Name="VersionNum"
-                    Text="Version: 0.0.1"
-                    FontSize="Micro"
-                    FontAttributes="None"
-                    TextColor="#7f8895"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    Margin="10,0,0,0"/>
+                    x:Name="gridFooter"
+                    Padding="0"
+                    BackgroundColor="#17181d"
+                    VerticalOptions="End">
+                        <Label 
+                        x:Name="VersionNum"
+                        Text="Version: 0.0.1"
+                        FontSize="Micro"
+                        FontAttributes="None"
+                        TextColor="#7f8895"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        Margin="10,0,0,0"/>
 
+                <StackLayout x:Name="stackLayout">
                     <Button
-                x:Name="ButtonInstall"
-                Text="Install"
-                FontSize="Default"
-                FontAttributes="Bold"
-                TextColor="#32191e"
-                BackgroundColor="#ed1c24"
-                HorizontalOptions="End"
-                VerticalOptions="Center"
-                Margin="10,10,10,10"
-                Clicked="OnInstallButtonClicked">
+                        x:Name="ButtonInstall"
+                        Text="Install"
+                        FontSize="Default"
+                        FontAttributes="Bold"
+                        TextColor="NavajoWhite"
+                        BackgroundColor="#ed1c24"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Margin="10,10,10,10"
+                        Clicked="OnInstallButtonClicked">
                         <Button.ImageSource>
                             <FontImageSource
-                            FontFamily="FontAwesome"
-                            Size="Large"
-                            Color="White"/>
+                                    FontFamily="FontAwesome"
+                                    Size="Large"
+                                    Color="White"/>
                         </Button.ImageSource>
                     </Button>
 
                     <!-- Add more elements here as needed -->
-
-                </Grid>
+                </StackLayout>
+            </Grid>
 
 
             </Grid>
