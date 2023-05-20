@@ -2,7 +2,6 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:v="clr-namespace:HuaweiHMSInstaller.Views"
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
             x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
@@ -12,27 +11,35 @@
                 x:Name="Body"
                 Spacing="0"
                 Padding="0"
-                VerticalOptions="CenterAndExpand">
+                VerticalOptions="Center">
 
             <StackLayout>
                 <Label 
-            x:Name="TitleEmulator"
-            Text="Download and Installing"
-            FontSize="Header"
-            FontAttributes="Bold"
-            TextColor="White"
-            HorizontalOptions="Center"
-            VerticalOptions="Center"
-            Margin="10,10,10,20"/>
+                    x:Name="TitleEmulator"
+                    Text="Download and Installing"
+                    FontSize="Header"
+                    FontAttributes="Bold"
+                    TextColor="White"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                Margin="10,10,10,20"/>
 
-                <ProgressBar x:Name="progressBar" Progress="0.5" ProgressColor="#ed1c24" ScaleX="4" ScaleY="2"/>
+                <ProgressBar x:Name="progressBar" Progress="0.01" ProgressColor="#ed1c24" ScaleX="4" ScaleY="2" MaximumWidthRequest="100" />
                 <Grid HorizontalOptions="Center"
                   VerticalOptions="Center"
                   Margin="10,10,10,10">
                     <FlexLayout AlignItems="Center" Direction="Column">
                         <Label FontSize="Medium" Text="{Binding Source={x:Reference progressBar}, Path=Progress, StringFormat='{0:P0}'}" Margin="5" />
-                        <Label Text="This is a comment." />
+                        <Grid HorizontalOptions="Center" FlowDirection="MatchParent" VerticalOptions="Center">
+                            <StackLayout FlowDirection="MatchParent" FlexLayout.AlignSelf="Center" FlexLayout.Basis="Auto" HorizontalOptions="Center" VerticalOptions="Center">
+                                <Label x:Name="commentLabel" Text=""/>
+                                <Label HorizontalOptions="Center" VerticalOptions="Center" x:Name="dotAnimation" Text=""/>
+                            </StackLayout>
+
+
+                        </Grid>
                     </FlexLayout>
+                    
                 </Grid>
             </StackLayout>
 
@@ -46,7 +53,9 @@
         <Grid
             Padding="0"
             BackgroundColor="#17181d"
+            MaximumHeightRequest="100"
             VerticalOptions="End">
+            
             <Label 
                     x:Name="VersionNum"
                     Text="Step 1"
@@ -55,6 +64,17 @@
                     TextColor="#7f8895"
                     HorizontalOptions="Start"
                     VerticalOptions="Center"
+                    Margin="10,10,10,20"/>
+
+            <Label 
+                    x:Name="HMSInfoLabel"
+                    Text="HMS CORE"
+                    FontSize="Small"
+                    FontAttributes="None"
+                    TextColor="#7f8895"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="800"
                     Margin="10,10,10,20"/>
 
             <!-- Add more elements here as needed -->
