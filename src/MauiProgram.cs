@@ -23,9 +23,9 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
                 fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");
                 fonts.AddFont("Roboto-Regular.ttf", "Roboto-Regular");
-                fonts.AddFont("FontAwesomeRegular.ttf", "FontRegular");  
-                fonts.AddFont("FontAwesomeBrands.ttf", "FontBrands");  
-                fonts.AddFont("FontAwesomeSolid.ttf", "FontSolid"); 
+                fonts.AddFont("FA-Brands-Regular-400.otf", "FontBrands");  
+                fonts.AddFont("FA-Free-Regular-400.otf", "FontRegular");  
+                fonts.AddFont("FA-Free-Solid-900.otf", "FontSolid"); 
             });
 
         Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping(nameof(IWindow), (handler, view) =>

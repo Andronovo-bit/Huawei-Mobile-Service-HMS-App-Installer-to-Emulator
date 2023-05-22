@@ -56,6 +56,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="Resources\Fonts\FA-Brands-Regular-400.otf" />
+	  <None Remove="Resources\Fonts\FA-Free-Regular-400.otf" />
+	  <None Remove="Resources\Fonts\FA-Free-Solid-900.otf" />
 	  <None Remove="Resources\Images\huawei_background.png" />
 	</ItemGroup>
 
