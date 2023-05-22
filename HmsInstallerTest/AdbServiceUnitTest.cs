@@ -41,7 +41,7 @@ namespace HmsInstallerTest
             // You may need to mock the AdbClient class to simulate a connected device
 
             // Act
-            var device = await service.GetDevice();
+            var device = await service.GetDevices();
 
             // Assert
             Assert.NotNull(device);

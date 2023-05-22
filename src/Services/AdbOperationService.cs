@@ -8,7 +8,7 @@ using AdvancedSharpAdbClient;
 
 namespace HuaweiHMSInstaller.Services
 {
-    public class AdbOperationService
+    public class AdbOperationService : IAdbOperationService
     {
         private readonly AdbClient _adbClient;
 
@@ -60,17 +60,14 @@ namespace HuaweiHMSInstaller.Services
             }
         }
 
-
-        public async Task<DeviceData> GetDevice()
+        public async Task<List<DeviceData>> GetDevices()
         {
             var devices = await _adbClient.GetDevicesAsync();
             if (devices.Count == 0)
             {
                 return null;
             }
-
-            var device = devices.FirstOrDefault();
-            return device;
+            return devices;
         }
     }
 }

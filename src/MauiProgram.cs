@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using HuaweiHMSInstaller.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
 using Microsoft.Maui.Controls.PlatformConfiguration;
@@ -57,7 +58,9 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
+        var services = builder.Services;
+        services.AddScoped<IAdbOperationService, AdbOperationService>();
 
-		return builder.Build();
+        return builder.Build();
 	}
 }
