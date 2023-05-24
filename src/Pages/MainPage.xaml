@@ -6,6 +6,10 @@
              BackgroundImageSource="huawei_background.png"
              x:Class="HuaweiHMSInstaller.MainPage">
 
+    <ContentPage.Resources>
+        <x:String x:Key="smile">&#xf118;</x:String>
+    </ContentPage.Resources>
+
     <ContentView>
 
 
@@ -71,8 +75,9 @@
                         Clicked="OnInstallButtonClicked">
                         <Button.ImageSource>
                             <FontImageSource
-                                    FontFamily="FontAwesome"
-                                    Size="Large"
+                                    FontFamily="FontSolid"
+                                    Size="Medium"
+                                    Glyph="{StaticResource smile}"
                                     Color="White"/>
                         </Button.ImageSource>
                     </Button>
