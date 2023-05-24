@@ -9,8 +9,9 @@ namespace HuaweiHMSInstaller.Services
 {
     public interface IAdbOperationService
     {
+        public IProgress<float> Progress { get;set; }
         public bool CheckAdbServer();
-        public Task DownloadAdbFromInternet();
+        public Task DownloadAdbFromInternetAsync(IProgress<float> progress = null);
         public Task<List<DeviceData>> GetDevices();
     }
 }

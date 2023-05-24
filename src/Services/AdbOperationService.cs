@@ -5,16 +5,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AdvancedSharpAdbClient;
+using HuaweiHMSInstaller.Helper;
 
 namespace HuaweiHMSInstaller.Services
 {
     public class AdbOperationService : IAdbOperationService
     {
+        // Use constants or configuration values for the URL and the destination folder
+        private const string AdbUrl = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip";
+        private const string AdbFolder = "adb_server";
+
+        // Use HttpClientFactory or dependency injection to create HttpClient instances
+        private readonly HttpClient _client;
         private readonly AdbClient _adbClient;
 
-        public AdbOperationService()
+        public IProgress<float> Progress { get; set; }
+
+
+        public AdbOperationService(HttpClient client)
         {
             _adbClient = new AdbClient();
+            _client = client ?? throw new ArgumentNullException(nameof(client));
+
         }
 
         public bool CheckAdbServer()
@@ -22,43 +34,24 @@ namespace HuaweiHMSInstaller.Services
             return AdbServer.Instance.GetStatus().IsRunning;
         }
 
-        public async Task DownloadAdbFromInternet()
+        // A public method that downloads and extracts the adb file
+        public async Task DownloadAdbFromInternetAsync(IProgress<float> progress = null)
         {
-            // Use a constant or a configuration value for the URL
-            const string adbUrl = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip";
-            // Use a constant or a configuration value for the destination folder
-            const string adbFolder = "adb_server";
-            // Call the helper method to download and extract the file
-            await DownloadAndExtractFileAsync(adbUrl, adbFolder);
+            // Get the file name from the URL
+            string fileName = Path.GetFileName(AdbUrl);
+            // Create a file stream to store the downloaded data
+            using (var file = new FileStream(Path.Combine(Path.GetTempPath(), fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+            {
+                // Download the file using the custom extension method
+                await _client.DownloadAsync(AdbUrl, file, Progress);
+            }
+
+            // Extract the file to the destination folder
+            ZipFile.ExtractToDirectory(Path.Combine(Path.GetTempPath(), fileName), Path.Combine(Path.GetTempPath(), AdbFolder),true);
+            // Delete the file
+            File.Delete(Path.Combine(Path.GetTempPath(), fileName));
         }
 
-        // A helper method that downloads and extracts a file from a given URL to a given folder
-        private async Task DownloadAndExtractFileAsync(string url, string folder)
-        {
-            // Use HttpClientFactory or dependency injection to create HttpClient instances
-            using (HttpClient client = new HttpClient())
-            {
-                try
-                {
-                    // Get the file name from the URL
-                    string fileName = Path.GetFileName(url);
-                    // Download the file as a byte array
-                    var response = await client.GetAsync(url);
-                    var content = await response.Content.ReadAsByteArrayAsync();
-                    // Write the file to disk
-                    File.WriteAllBytes(fileName, content);
-                    // Extract the file to the destination folder
-                    ZipFile.ExtractToDirectory(fileName, folder);
-                    // Delete the file
-                    File.Delete(fileName);
-                }
-                catch (Exception e)
-                {
-                    // Handle or log the exception as needed
-                    Console.WriteLine(e.Message);
-                }
-            }
-        }
 
         public async Task<List<DeviceData>> GetDevices()
         {
