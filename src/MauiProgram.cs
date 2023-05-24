@@ -1,10 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using HuaweiHMSInstaller.Services;
 using Microsoft.Extensions.Logging;
-using Microsoft.Maui.Controls.Compatibility.Hosting;
-using Microsoft.Maui.Controls.PlatformConfiguration;
-using Microsoft.Maui.Handlers;
-using Microsoft.Maui.LifecycleEvents;
 using Syncfusion.Maui.Core.Hosting;
 
 namespace HuaweiHMSInstaller;
@@ -59,6 +55,7 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         var services = builder.Services;
+        services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
 
         return builder.Build();
