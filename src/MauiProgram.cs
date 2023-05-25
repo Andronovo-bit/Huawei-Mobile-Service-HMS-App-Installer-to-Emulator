@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Maui.Core.Hosting;
@@ -55,6 +56,8 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         var services = builder.Services;
+        builder.Services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(),"HuaweiHMSInstaller")); //configure value
+
         services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
 
