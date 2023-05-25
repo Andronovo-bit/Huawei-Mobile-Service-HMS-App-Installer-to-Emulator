@@ -5,6 +5,10 @@
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
             x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
+
+    <ContentPage.Resources>
+        <x:String x:Key="GreenLamb">&#xf7a1;</x:String>
+    </ContentPage.Resources>
     
     <Grid>
         <VerticalStackLayout
@@ -24,7 +28,7 @@
                     VerticalOptions="Center"
                 Margin="10,10,10,20"/>
 
-                <ProgressBar x:Name="progressBar" Progress="0.01" ProgressColor="#ed1c24" ScaleX="4" ScaleY="2" MaximumWidthRequest="100" />
+                <ProgressBar x:Name="progressBar" Progress="0.00" ProgressColor="#ed1c24" ScaleX="4" ScaleY="2" MaximumWidthRequest="100" />
                 <Grid HorizontalOptions="Center"
                   VerticalOptions="Center"
                   Margin="10,10,10,10">
@@ -33,10 +37,8 @@
                         <Grid HorizontalOptions="Center" FlowDirection="MatchParent" VerticalOptions="Center">
                             <StackLayout FlowDirection="MatchParent" FlexLayout.AlignSelf="Center" FlexLayout.Basis="Auto" HorizontalOptions="Center" VerticalOptions="Center">
                                 <Label x:Name="commentLabel" Text=""/>
-                                <Label HorizontalOptions="Center" VerticalOptions="Center" x:Name="dotAnimation" Text=""/>
+                                <Label HorizontalOptions="Center" VerticalOptions="Center" x:Name="dotAnimation" Text="."/>
                             </StackLayout>
-
-
                         </Grid>
                     </FlexLayout>
                     
@@ -74,8 +76,29 @@
                     TextColor="#7f8895"
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
-                    MaximumWidthRequest="800"
+                    MaximumWidthRequest="750"
                     Margin="10,10,10,20"/>
+            <FlexLayout AlignItems="Center" Direction="Row" HorizontalOptions="End" MaximumWidthRequest="100">
+                <Label 
+                    x:Name="StatusCheck"
+                    Text="
+                    "
+                    FontSize="Small"
+                    FontAttributes="None"
+                    TextColor="#7f8895"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Margin="10,10,10,20"/>
+
+                <Image BackgroundColor="Green" HorizontalOptions="End" VerticalOptions="Center" Margin="10,10,10,20">
+                    <Image.Source>
+                        <FontImageSource Glyph="{StaticResource GreenLamb}"
+                         FontFamily="FontSolid"
+                         Size="14" />
+                    </Image.Source>
+                </Image>
+            </FlexLayout>
+
 
             <!-- Add more elements here as needed -->
 
