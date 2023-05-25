@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Net;
 
 namespace HuaweiHMSInstaller.Helper
 {
@@ -13,7 +8,7 @@ namespace HuaweiHMSInstaller.Helper
         {
             try
             {
-                System.Net.IPHostEntry i = System.Net.Dns.GetHostEntry("www.google.com");
+                IPHostEntry i = Dns.GetHostEntry("www.google.com");
                 return true;
             }
             catch

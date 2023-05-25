@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace HuaweiHMSInstaller.Models
 {
     public static class AdbMessagesConst
@@ -16,7 +13,6 @@ namespace HuaweiHMSInstaller.Models
         public const string InstallingHMSAppGallery = "Installing the HMS AppGallery";
         public const string DownloadingGame = "Downloading Game";
         public const string InstallingGame = "Installing Game";
-        public const string ConnectionYourADBDevices = "Connection Your ADB Devices (Emulator)";
         public const string Finishing = "Finishing";
 
         public readonly static Dictionary<string,bool> Messages = 
@@ -27,7 +23,6 @@ namespace HuaweiHMSInstaller.Models
             { DownloadingHMSCore, true },
             { DownloadingHMSAppGallery, true },
             { DownloadingGame, true },
-            { ConnectionYourADBDevices, true },
             { InstallingHMSCore, true },
             { InstallingHMSAppGallery, true },
             { InstallingGame, true },
