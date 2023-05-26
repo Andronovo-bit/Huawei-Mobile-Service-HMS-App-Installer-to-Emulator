@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-namespace HuaweiHMSInstaller.Models
+﻿namespace HuaweiHMSInstaller.Models
 {
     public static class AdbMessagesConst
     {
@@ -29,5 +26,16 @@ namespace HuaweiHMSInstaller.Models
             { Finishing, true },
         };
 
+    }
+
+    public static class HmsInfoMessagesConst{
+        public static readonly string[] hmsInfoMessage = new string[]
+        {
+            "Huawei Mobile Services (HMS) is a suite of mobile services developed by Huawei for its smartphones and other devices.",
+            "HMS is available in over 170 countries and regions, and it is used by over 700 million users worldwide.",
+            "Huawei is constantly expanding the HMS ecosystem, and it is working to bring new and innovative services to its users.",
+            "HMS is designed to be a secure and reliable alternative to Google Mobile Services (GMS), which is the suite of mobile services that is used by most Android smartphones.",
+            "HMS includes a variety of services, such as the AppGallery app store, the Huawei Cloud cloud storage service, and the Huawei Health fitness tracking service.",
+        };
     }
 }

@@ -1,3 +1,4 @@
+using HuaweiHMSInstaller.Helper;
 using Microsoft.Maui.Controls.Shapes;
 using Syncfusion.Maui.Popup;
 
@@ -9,11 +10,7 @@ public partial class ThanksPage : ContentPage
 	public ThanksPage()
 	{
 		InitializeComponent();
-
-
     }
-
-
     private void OnFinishButtonClicked(object sender, EventArgs e)
     {
         //Create popup and push it to the navigation stack
@@ -65,9 +62,9 @@ public partial class ThanksPage : ContentPage
         //add label 3, 2, 1, 0 animation
         Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
         {
-            label.Behaviors.Add(new CountDownBehavior());
+            label.Behaviors.Add(new CountDownBehavior(true));
 
-            return true;
+            return false;
         });
 
         //Set the label as the popup content
@@ -81,35 +78,7 @@ public partial class ThanksPage : ContentPage
     {
         //Pop the popup from the navigation stack
         _sfPopup.Dismiss();
+        _sfPopup.IsOpen = false;
     }
 }
 
-internal class CountDownBehavior : Behavior
-{
-    private Label _label;
-    private int _count = 3;
-    protected override void OnAttachedTo(BindableObject bindable)
-    {
-        base.OnAttachedTo(bindable);
-        _label = bindable as Label;
-        Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
-        
-        {
-            _label.Text = _count.ToString();
-            _count--;
-            if (_count == -1)
-            {
-                _label.Text = "Bye Bye";
-                // close application after 1 second use dispatcher
-                Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
-                {
-                    System.Environment.Exit(0);
-                    return false;
-                });
-                
-                return false;
-            }
-            return true;
-        });
-    }
-}

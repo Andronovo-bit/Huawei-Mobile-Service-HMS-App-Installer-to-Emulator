@@ -9,7 +9,7 @@ namespace HuaweiHMSInstaller;
 public partial class MainPage : ContentPage
 {
     private SfPopup _sfPopup;
-    private Button footerButton = new Button();
+    private Button footerButton = new ();
 
     public MainPage()
     {
@@ -43,8 +43,8 @@ public partial class MainPage : ContentPage
         // Create an animation that scales the circle and rotates the check mark
         var animationMark = new Animation
         {
-            { 0, 0.5, new Animation(v => checkMark.Scale = v, 1, 1.2) },
-            { 0.5, 1, new Animation(v => checkMark.Scale = v, 1.2, 1) },
+            { 0, 0.5, new (v => checkMark.Scale = v, 1, 1.2) },
+            { 0.5, 1, new (v => checkMark.Scale = v, 1.2, 1) },
         };
 
         // Use a stack layout to arrange multiple objects
@@ -72,8 +72,8 @@ public partial class MainPage : ContentPage
             VerticalOptions = LayoutOptions.Center,
         };
         //label add ... animation
-       // var dotAnimationBehavior = new DotAnimationBehavior();
-        //label.Behaviors.Add(dotAnimationBehavior);
+        var dotAnimationBehavior = new DotAnimationBehavior();
+        label.Behaviors.Add(dotAnimationBehavior);
 
         stackLayout.Children.Add(label);
 
@@ -86,8 +86,6 @@ public partial class MainPage : ContentPage
         //get popup size
 
         var resultCheckingInternetConnection = await CheckInternetConnection.CheckForInternetConnectionAsync();
-        
-
         
         Dispatcher.StartTimer(TimeSpan.FromSeconds(4), () =>
         {
@@ -113,7 +111,6 @@ public partial class MainPage : ContentPage
             else
             {
                 label.Text = "Internet Connection NOT OK. Try Again";
-               // button.IsVisible = true;
                 stackLayout.Children.Remove(circle);
                 grid.Children.Add(wrongMark);
                 // Add a button as the third object
@@ -139,7 +136,7 @@ public partial class MainPage : ContentPage
     private void CreateCircle(out Ellipse circle)
     {
         // Create a linear gradient brush
-        LinearGradientBrush brush = new LinearGradientBrush
+        var brush = new LinearGradientBrush
         {
             // Set the start and end points of the gradient axis
             StartPoint = new Point(0, 0),
@@ -255,7 +252,5 @@ public partial class MainPage : ContentPage
             };
             return footerButton;
         });
-
-
     }
 }

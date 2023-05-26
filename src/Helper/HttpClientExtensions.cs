@@ -39,7 +39,6 @@ namespace HuaweiHMSInstaller.Helper
                     var value = (float)totalRead / denominator;
                     if(value > 0.01)
                         progress.Report(value);
-
                 }
             }
             return;
