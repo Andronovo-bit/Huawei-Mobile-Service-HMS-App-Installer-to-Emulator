@@ -19,18 +19,18 @@ namespace HuaweiHMSInstaller.Services
         private const string AdbUrl = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip";
         private const string AdbFolder = "adb_server";
 
-        // Use HttpClientFactory or dependency injection to create HttpClient instances
-        private readonly HttpClient _client;
+        // Dependency injection to create HttpClient, AdbClient, Options instances
+        private readonly HttpClient _httpClient;
         private readonly AdbClient _adbClient;
         private readonly GlobalOptions _options;
-        
 
-
-        public AdbOperationService(HttpClient client, IOptions<GlobalOptions> options)
+        public AdbOperationService(
+                            HttpClient httpClient, 
+                            IOptions<GlobalOptions> options)
         {
             _adbClient = new AdbClient();
             _options = options.Value;
-            _client = client ?? throw new ArgumentNullException(nameof(client));
+            _httpClient = httpClient;
 
         }
         public bool CheckAdbServer()
@@ -50,7 +50,7 @@ namespace HuaweiHMSInstaller.Services
             using (var file = new FileStream(Path.Combine(_options.ProjectOperationPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
                 // Download the file using the custom extension method
-                await _client.DownloadAsync(AdbUrl, file, progress);
+                await _httpClient.DownloadAsync(AdbUrl, file, progress);
             }
 
             // Extract the file to the destination folder
@@ -67,15 +67,22 @@ namespace HuaweiHMSInstaller.Services
             }
             return devices;
         }
-        
         public async Task DownloadApkFromInternetAsync(string apkUrl, string apkName, IProgress<float> progress = null)
         {
             // Create a file stream to store the downloaded data
             using (var file = new FileStream(Path.Combine(_options.ProjectOperationPath, apkName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
                 // Download the file using the custom extension method
-                await _client.DownloadAsync(apkUrl, file, progress);
+                await _httpClient.DownloadAsync(apkUrl, file, progress);
             }
+        }
+        public void InstallApkToDevice(string packageFilePath, ProgressHandler InstallProgressChanged, DeviceData device)
+        {
+            PackageManager manager = new PackageManager(_adbClient, device);
+            manager.InstallProgressChanged += InstallProgressChanged;
+            // Install the APK
+            manager.InstallPackage(packageFilePath, true);
+
         }
 
     }
