@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using HuaweiHMSInstaller.Integrations;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
 using Microsoft.Extensions.Logging;
@@ -60,6 +61,8 @@ public static class MauiProgram
 
         services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
+        services.AddScoped<IAppGalleryIntegration, AppGalleryIntegration>();
+        services.AddScoped<IAppGalleryService, AppGalleryService>();
 
         return builder.Build();
 	}
