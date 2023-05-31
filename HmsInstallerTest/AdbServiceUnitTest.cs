@@ -8,8 +8,7 @@ namespace HmsInstallerTest
 {
     public class AdbServiceUnitTest
     {
-        private Mock<HttpClient> _httpClient = new();
-        private Mock<IAdbOperationService> _AdbOperationService = new Mock<IAdbOperationService>();
+        private readonly Mock<IAdbOperationService> _AdbOperationService = new ();
 
         [Fact]
         public void CheckAdbServer_ReturnsTrue_WhenServerIsRunning()
