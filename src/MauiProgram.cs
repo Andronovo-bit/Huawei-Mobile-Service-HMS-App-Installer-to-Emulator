@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Maui;
 using HuaweiHMSInstaller.Integrations;
 using HuaweiHMSInstaller.Models;
+using HuaweiHMSInstaller.Resources.Languages;
 using HuaweiHMSInstaller.Services;
+using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Maui.Core.Hosting;
 
@@ -11,11 +13,17 @@ public static class MauiProgram
 {      
     public static MauiApp CreateMauiApp()
 	{
-		var builder = MauiApp.CreateBuilder();
+        var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
 			.UseMauiCommunityToolkit()
             .ConfigureSyncfusionCore()
+            .UseLocalizationResourceManager(settings =>
+            {
+                settings.RestoreLatestCulture(true);
+                settings.AddResource(AppResources.ResourceManager);
+                settings.InitialCulture(new System.Globalization.CultureInfo("en-Us"));
+            })
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

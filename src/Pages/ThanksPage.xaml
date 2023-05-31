@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              xmlns:popup ="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
              x:Class="HuaweiHMSInstaller.Pages.ThanksPage">
-    <Grid>
-        <VerticalStackLayout
+
+    <ContentPage.Resources>
+        <x:String x:Key="finish">&#xf11e;</x:String>
+        <x:String x:Key="back">&#xf30a;</x:String>
+    </ContentPage.Resources>
+    <ContentView>
+
+        <Grid>
+            <VerticalStackLayout
                 Spacing="0"
                 Padding="0"
                 VerticalOptions="Center">
 
-            <Label 
+                <Label 
                     x:Name="TitleWelcome"
-                    Text="Thanks for the Installing"
+                    Text="{loc:Translate thanks_for_installing}"
                     FontSize="Header"
                     FontAttributes="None"
                     TextColor="White"
@@ -21,10 +29,10 @@
                     VerticalOptions="Center"
                     Margin="0,0,0,0"/>
 
-            <!-- Use auto sizing for the label height and width -->
-            <Label 
+                <!-- Use auto sizing for the label height and width -->
+                <Label 
                     x:Name="TitleEmulator"
-                    Text="Huawei Emulator Enviroment"
+                    Text="{loc:Translate huawei_emulator_installer}"
                     FontSize="Header"
                     FontAttributes="Bold"
                     TextColor="White"
@@ -32,16 +40,16 @@
                     VerticalOptions="Center"
                     Margin="0,0,0,0"/>
 
-            <!-- Add more elements here as needed -->
+                <!-- Add more elements here as needed -->
 
-        </VerticalStackLayout>
+            </VerticalStackLayout>
 
 
-        <Grid
+            <Grid
             Padding="0"
             BackgroundColor="#17181d"
             VerticalOptions="End">
-            <Label 
+                <Label 
                     x:Name="VersionNum"
                     Text="Step 2"
                     FontSize="Medium"
@@ -50,35 +58,58 @@
                     HorizontalOptions="Start"
                     VerticalOptions="Center"
                     Margin="10,0,0,0"/>
-            <StackLayout x:Name="stackLayout">
-                <Button
-                x:Name="ButtonInstall"
-                Text="Finish"
-                FontSize="Default"
-                FontAttributes="Bold"
-                TextColor="NavajoWhite"
-                BackgroundColor="#ed1c24"
-                HorizontalOptions="End"
-                VerticalOptions="Center"
-                Margin="10,10,10,10"
-                Clicked="OnFinishButtonClicked">
-                    <Button.ImageSource>
-                        <FontImageSource
-                            FontFamily="FontAwesome"
-                            Size="Large"
-                            Color="White"/>
-                    </Button.ImageSource>
-                </Button>
-                <!--<popup:SfPopup x:Name="popup" />-->
+                <StackLayout x:Name="stackLayout">
+                    <FlexLayout VerticalOptions="End" HorizontalOptions="End">
 
-            </StackLayout>
+                        <Button
+                        x:Name="ButtonBack"
+                        Text="{loc:Translate back_to_install_page}"
+                        FontSize="Default"
+                        FontAttributes="Bold"
+                        TextColor="NavajoWhite"
+                        BackgroundColor="#ed1c24"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        Margin="10,10,10,10"
+                        Clicked="ButtonBack_Clicked">
+                            <Button.ImageSource>
+                                <FontImageSource
+                                FontFamily="FontSolid"
+                                Size="Medium"
+                                Glyph="{StaticResource back}"
+                                Color="White"/>
+                            </Button.ImageSource>
+                        </Button>
+                        
+                        <Button
+                            x:Name="ButtonFinish"
+                            Text="{loc:Translate finish}"
+                            FontSize="Default"
+                            FontAttributes="Bold"
+                            TextColor="NavajoWhite"
+                            BackgroundColor="#ed1c24"
+                            HorizontalOptions="End"
+                            VerticalOptions="Center"
+                            Margin="10,10,10,10"
+                            Clicked="OnFinishButtonClicked">
+                            <Button.ImageSource>
+                                <FontImageSource
+                                FontFamily="FontSolid"
+                                Size="Medium"
+                                Glyph="{StaticResource finish}"
+                                Color="White"/>
+                            </Button.ImageSource>
+                        </Button>
+
+                    </FlexLayout>
+                </StackLayout>
 
 
-            <!-- Add more elements here as needed -->
-           
+                <!-- Add more elements here as needed -->
+
+            </Grid>
+
         </Grid>
-
-    </Grid>
-    
+    </ContentView>
 
 </ContentPage>

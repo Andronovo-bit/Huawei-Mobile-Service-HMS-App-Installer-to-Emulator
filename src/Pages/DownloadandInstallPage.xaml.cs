@@ -2,6 +2,7 @@ using AdvancedSharpAdbClient;
 using HuaweiHMSInstaller.Helper;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
+using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Text;
@@ -32,17 +33,27 @@ public partial class DownloadandInstallPage : ContentPage
 	//HMS Links
 	private const string AppGallery = "https://appgallery.cloud.huawei.com/appdl/C27162?";
 	private const string HmsCore = "https://appgallery.cloud.huawei.com/appdl/C10132067?";
-	private const string InstallGame = "https://appgallery.cloud.huawei.com/appdl/C107971673?";
+
+	private readonly string InstallGame;
+    private readonly string GameName;
+    private readonly SearchListItem GameItem;
+
 
     #endregion
 
     private readonly IAdbOperationService adbOperationService;
 	private readonly GlobalOptions _options;
+    private readonly ILocalizationResourceManager _localizationResourceManager;
 
-	public DownloadandInstallPage()
+    public DownloadandInstallPage(SearchListItem item)
 	{
 		adbOperationService = ServiceProvider.GetService<IAdbOperationService>();
-		_options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
+        _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
+
+        _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
+        GameItem = item;
+        InstallGame = $"https://appgallery.cloud.huawei.com/appdl/{GameItem.AppId}?";
+        GameName = GameItem.Name;
 
 		InitializeComponent();
 
@@ -141,8 +152,12 @@ public partial class DownloadandInstallPage : ContentPage
 	private async Task AlertForNotHaveAdbDevices()
 	{
 		await Task.Delay(1000);
+        var errorLanguage = _localizationResourceManager.GetValue("error");
+        var emulatorConnectLanguage = _localizationResourceManager.GetValue("emulator_try_again_connect");
+        var cancelLanguage = _localizationResourceManager.GetValue("cancel");
+        var retryLanguage = _localizationResourceManager.GetValue("retry");
 
-		var result = await DisplayAlert("Error", "Please connect your device or emulator and try again", "Retry", "Cancel", FlowDirection.LeftToRight);
+		var result = await DisplayAlert(errorLanguage, emulatorConnectLanguage, retryLanguage, cancelLanguage, FlowDirection.LeftToRight);
 
 		if (result)
 		{
@@ -183,6 +198,9 @@ public partial class DownloadandInstallPage : ContentPage
         {
             this.progressBar.Progress = globalProgress;
         }));
+
+        if (thresholds.Length == index) return;
+
         if (globalProgress >= thresholds[index] / 100f)
         {
             index++;
@@ -201,7 +219,12 @@ public partial class DownloadandInstallPage : ContentPage
         if (adbProgressMsg.Count > index)
         {
             commentBuilder.Clear();
-            commentBuilder.Append(adbProgressMsg[index]);
+            var value = adbProgressMsg[index];
+            if(value == AdbMessagesConst.DownloadingGame || value == AdbMessagesConst.InstallingGame)
+            {
+                value += ": " + GameName;
+            }
+            commentBuilder.Append(value);
             Dispatcher.Dispatch(delegate
             {
                 this.commentLabel.Text = commentBuilder.ToString();
@@ -241,7 +264,7 @@ public partial class DownloadandInstallPage : ContentPage
         //var progressValues = new double[] { 0.10, 0.20, 0.30 };
         var apkUrls = new string[] { HmsCore, AppGallery, InstallGame };
         var constantMessage = new string[] { AdbMessagesConst.DownloadingHMSCore, AdbMessagesConst.DownloadingHMSAppGallery, AdbMessagesConst.DownloadingGame };
-        var apkNames = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{nameof(InstallGame)}.apk" };
+        var apkNames = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{GameItem.AppId}.apk" };
         var queueProgress = new Queue<double>();
         for (int i = 0; i < apkUrls.Length; i++)
         {
@@ -276,7 +299,7 @@ public partial class DownloadandInstallPage : ContentPage
     private async Task InstallHmsAppsAsync(DeviceData device)
     {
         //Apk Paths
-        var apkPaths = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{nameof(InstallGame)}.apk" };
+        var apkPaths = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{GameItem.AppId}.apk" };
         var queueProgress = new Queue<double>();
 
         //Progress
@@ -302,8 +325,13 @@ public partial class DownloadandInstallPage : ContentPage
 		});
 
     }
+
     #endregion
 
-
+    private void ButtonCancel_Clicked(object sender, EventArgs e)
+    {
+        //Cancel the operation this page
+        Navigation.PopAsync();
+    }
 }
 

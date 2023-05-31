@@ -2,28 +2,42 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:lang="clr-namespace:HuaweiHMSInstaller.Resources.Languages"
+             xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
+             xmlns:vm="clr-namespace:HuaweiHMSInstaller.Models"
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
              x:Class="HuaweiHMSInstaller.MainPage">
 
+
     <ContentPage.Resources>
-        <x:String x:Key="smile">&#xf118;</x:String>
+        <x:String x:Key="install">&#xf019;</x:String>
     </ContentPage.Resources>
 
     <ContentView>
 
-
         <Grid x:Name="MainContentViewArea">
+            <Picker x:Name="langPicker" VerticalOptions="Start" HorizontalOptions="Start" MaximumWidthRequest="100" Margin="10,10,10,10" SelectedIndexChanged="langPicker_SelectedIndexChanged" >
+                <Picker.Items>
+                    <x:String>EN</x:String>
+                    <x:String>TR</x:String>
+                    <x:String>ES</x:String>
+                </Picker.Items>
+            </Picker>
+
 
             <!-- Use a vertical stack layout to arrange the elements -->
             <VerticalStackLayout
-                Spacing="0"
-                Padding="0"
-                VerticalOptions="Center">
+                Spacing="10"
+                Padding="10"
+                Margin="0,20,0,0"
+                VerticalOptions="Start">
 
                     <Label 
                     x:Name="TitleWelcome"
-                    Text="Welcome to"
+                    Text="{loc:Translate welcome_to}"
                     FontSize="Header"
                     FontAttributes="None"
                     TextColor="White"
@@ -34,7 +48,7 @@
                     <!-- Use auto sizing for the label height and width -->
                     <Label 
                     x:Name="TitleEmulator"
-                    Text="Huawei Emulator Installer"
+                    Text="{loc:Translate huawei_emulator_installer}"
                     FontSize="Header"
                     FontAttributes="Bold"
                     TextColor="White"
@@ -44,55 +58,101 @@
 
                     <!-- Add more elements here as needed -->
 
-                </VerticalStackLayout>
 
-                <Grid
-                    x:Name="gridFooter"
-                    Padding="0"
-                    BackgroundColor="#17181d"
-                    VerticalOptions="End">
-                        <Label 
-                        x:Name="VersionNum"
-                        Text="Version: 0.0.1"
-                        FontSize="Micro"
-                        FontAttributes="None"
-                        TextColor="#7f8895"
-                        HorizontalOptions="Start"
-                        VerticalOptions="Center"
-                        Margin="10,0,0,0"/>
+            </VerticalStackLayout>
+
+            <Grid
+                x:Name="gridFooter"
+                Padding="0"
+                BackgroundColor="#17181d"
+                VerticalOptions="End">
+
+
+                <Label 
+                    x:Name="VersionNum"
+                    Text="Version: 0.0.1"
+                    FontSize="Micro"
+                    FontAttributes="None"
+                    TextColor="#7f8895"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    Margin="10,0,0,0"/>
+
+                <Label 
+                    x:Name="HMSInfoLabel"
+                    Text="HMS CORE"
+                    FontSize="Small"
+                    FontAttributes="None"
+                    TextColor="#7f8895"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumWidthRequest="750"
+                    Margin="10,10,10,20"/>
 
                 <StackLayout x:Name="stackLayout">
-                    <Button
-                        x:Name="ButtonInstall"
-                        Text="Install"
-                        FontSize="Default"
-                        FontAttributes="Bold"
-                        TextColor="NavajoWhite"
-                        BackgroundColor="#ed1c24"
-                        HorizontalOptions="End"
-                        VerticalOptions="Center"
-                        Margin="10,10,10,10"
-                        Clicked="OnInstallButtonClicked">
-                        <Button.ImageSource>
-                            <FontImageSource
-                                    FontFamily="FontSolid"
-                                    Size="Medium"
-                                    Glyph="{StaticResource smile}"
-                                    Color="White"/>
-                        </Button.ImageSource>
-                    </Button>
+                <Button
+                    x:Name="ButtonInstall"
+                    Text="{loc:Translate install}"
+                    FontSize="Default"
+                    FontAttributes="Bold"
+                    TextColor="NavajoWhite"
+                    BackgroundColor="#ed1c24"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    Margin="10,10,10,10"
+                    IsEnabled="False"
+                    Opacity="0.5"
+                    Clicked="OnInstallButtonClicked">
+                    <Button.ImageSource>
+                        <FontImageSource
+                                FontFamily="FontSolid"
+                                Size="Medium"
+                                Glyph="{StaticResource install}"
+                                Color="White"/>
+                    </Button.ImageSource>
+                </Button>
 
-                    <!-- Add more elements here as needed -->
-                </StackLayout>
-            </Grid>
+                <!-- Add more elements here as needed -->
+            </StackLayout>
+        </Grid>
 
+            <StackLayout x:Name="searchBarStackLayout"
+                Margin="10,10,10,10"
+                Orientation="Vertical"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                MinimumWidthRequest="300">
 
-            </Grid>
+                <SearchBar x:Name="searchBar" FontAutoScalingEnabled="True" Placeholder="{loc:Translate search_games}" SearchButtonPressed="SearchBarPressedAsync" TextChanged="SearchBar_TextChanged" MaxLength="50" MaximumWidthRequest="500"></SearchBar>
 
+                <Grid x:Name="SearchLoader" Padding="5" Background="Transparent" WidthRequest="100" HeightRequest="100" IsVisible="false">
+                    <core:SfBusyIndicator Title="Searching..." TextColor="WhiteSmoke" FontAttributes="Bold" Grid.Row="0" Grid.Column="0"  HorizontalOptions="Center" VerticalOptions="Center" IsRunning="True" IndicatorColor="#ed1c24"/>
+                </Grid>
+
+                <Grid x:Name="SearchListFrameGrid">
+                    <!--<Frame x:Name="SearchListFrame"
+                    BorderColor="WhiteSmoke"
+                    CornerRadius="10"
+                    BackgroundColor="Transparent"
+                    IsVisible="false"
+                    Margin="0,10,0,0"></Frame>-->
+                </Grid>
+                <Label x:Name="selectedItemLabel"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    TextColor="White"
+                    FontSize="12"
+                    FontAutoScalingEnabled="True"
+                    Margin="0,10,0,0"
+                    MaximumHeightRequest="300"
+                    HorizontalTextAlignment="Center"
+                    VerticalTextAlignment="Center"
+                    ></Label>
+
+            </StackLayout>
+
+        </Grid>
 
     </ContentView>
 
 </ContentPage>
-
-<!--ImageSource="search.png" 
-                ContentLayout="Left,10-->

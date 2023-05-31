@@ -1,15 +1,20 @@
 using HuaweiHMSInstaller.Helper;
-using Microsoft.Maui.Controls.Shapes;
+using LocalizationResourceManager.Maui;
 using Syncfusion.Maui.Popup;
+using ServiceProvider = HuaweiHMSInstaller.Services.ServiceProvider;
 
 namespace HuaweiHMSInstaller.Pages;
 
 public partial class ThanksPage : ContentPage
 {
     private SfPopup _sfPopup;
-	public ThanksPage()
+    private readonly ILocalizationResourceManager _localizationResourceManager;
+
+    public ThanksPage()
 	{
-		InitializeComponent();
+        _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
+
+        InitializeComponent();
     }
     private void OnFinishButtonClicked(object sender, EventArgs e)
     {
@@ -17,10 +22,8 @@ public partial class ThanksPage : ContentPage
         //Initialize the popup
         var popup = new SfPopup();
         _sfPopup = popup;
-        // popup transparent background
-        //popup.Background = Color.FromRgba(0, 0, 0, 0.5);
         popup.AutoSizeMode = PopupAutoSizeMode.None;
-        popup.OverlayMode = PopupOverlayMode.Blur;
+        popup.OverlayMode = PopupOverlayMode.Transparent;
 
         popup.PopupStyle = new PopupStyle 
         { 
@@ -52,7 +55,7 @@ public partial class ThanksPage : ContentPage
         //Create a label for the popup content
         var label = new Label
         {
-            Text = "Thank you for choosing us!",
+            Text = $"{_localizationResourceManager.GetValue("thank_you_choosing_us")}!",
             TextColor = Color.FromArgb("#000000"),
             FontSize = 20,
             HorizontalOptions = LayoutOptions.Center,
@@ -79,6 +82,11 @@ public partial class ThanksPage : ContentPage
         //Pop the popup from the navigation stack
         _sfPopup.Dismiss();
         _sfPopup.IsOpen = false;
+    }
+
+    private async void ButtonBack_Clicked(object sender, EventArgs e)
+    {
+        await Application.Current.MainPage.Navigation.PushModalAsync(new MainPage(), true);
     }
 }
 

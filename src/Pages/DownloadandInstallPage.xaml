@@ -2,12 +2,13 @@
 
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background.png"
-            x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
+             x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
 
     <ContentPage.Resources>
-        <x:String x:Key="GreenLamb">&#xf7a1;</x:String>
+        <x:String x:Key="Cancel">&#xf00d;</x:String>
     </ContentPage.Resources>
     
     <Grid>
@@ -20,7 +21,7 @@
             <StackLayout>
                 <Label 
                     x:Name="TitleEmulator"
-                    Text="Download and Installing"
+                    Text="{loc:Translate downloading_and_installing}"
                     FontSize="Header"
                     FontAttributes="Bold"
                     TextColor="White"
@@ -59,46 +60,51 @@
             VerticalOptions="End">
             
             <Label 
-                    x:Name="VersionNum"
-                    Text="Step 1"
-                    FontSize="Medium"
-                    FontAttributes="None"
-                    TextColor="#7f8895"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    Margin="10,10,10,20"/>
+                x:Name="VersionNum"
+                Text="Step 1"
+                FontSize="Medium"
+                FontAttributes="None"
+                TextColor="#7f8895"
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                Margin="10,10,10,20"/>
 
             <Label 
-                    x:Name="HMSInfoLabel"
-                    Text="HMS CORE"
-                    FontSize="Small"
-                    FontAttributes="None"
-                    TextColor="#7f8895"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    MaximumWidthRequest="750"
-                    Margin="10,10,10,20"/>
-            <FlexLayout AlignItems="Center" Direction="Row" HorizontalOptions="End" MaximumWidthRequest="100">
-                <Label 
-                    x:Name="StatusCheck"
-                    Text="
-                    "
-                    FontSize="Small"
-                    FontAttributes="None"
-                    TextColor="#7f8895"
-                    HorizontalOptions="End"
-                    VerticalOptions="Center"
-                    Margin="10,10,10,20"/>
+                x:Name="HMSInfoLabel"
+                Text="HMS CORE"
+                FontSize="Small"
+                FontAttributes="None"
+                TextColor="#7f8895"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                MaximumWidthRequest="750"
+                Margin="10,10,10,20"/>
+            <Grid>
+                <StackLayout HorizontalOptions="End" MaximumWidthRequest="100">
 
-                <Image BackgroundColor="Green" HorizontalOptions="End" VerticalOptions="Center" Margin="10,10,10,20">
-                    <Image.Source>
-                        <FontImageSource Glyph="{StaticResource GreenLamb}"
-                         FontFamily="FontSolid"
-                         Size="14" />
-                    </Image.Source>
-                </Image>
-            </FlexLayout>
+                    <Button
+                        x:Name="ButtonCancel"
+                        Text="{loc:Translate cancel}"
+                        FontSize="Default"
+                        FontAttributes="Bold"
+                        TextColor="NavajoWhite"
+                        BackgroundColor="#ed1c24"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        Margin="10,10,10,10"
+                        IsVisible="false"
+                        Clicked="ButtonCancel_Clicked">
+                        <Button.ImageSource>
+                            <FontImageSource
+                                FontFamily="FontSolid"
+                                Size="Medium"
+                                Glyph="{StaticResource Cancel}"
+                                Color="#ed1c24"/>
+                        </Button.ImageSource>
+                    </Button>
 
+                </StackLayout>
+            </Grid>
 
             <!-- Add more elements here as needed -->
 
