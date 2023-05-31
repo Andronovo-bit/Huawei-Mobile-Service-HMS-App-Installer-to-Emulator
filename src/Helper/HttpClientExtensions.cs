@@ -30,7 +30,6 @@ namespace HuaweiHMSInstaller.Helper
             {
                 bytesRead = await source.ReadAsync(buffer, 0, bufferSize, cancellationToken);
                 await destination.WriteAsync(buffer, 0, bytesRead, cancellationToken);
-                
                 cancellationToken.ThrowIfCancellationRequested();
                 totalRead += bytesRead;
                 // Report the progress as a percentage of the source stream length or content length
@@ -47,22 +46,26 @@ namespace HuaweiHMSInstaller.Helper
 
         // This extension method downloads the data from the url to the file stream
         // and reports the progress to the IProgress<float> instance
-        public static async Task DownloadAsync(this HttpClient client, string url, Stream file,
-            IProgress<float> progress = null, CancellationToken cancellationToken = default)
+        public static async Task DownloadAsync(this IHttpClientFactory clientFactory, string url, Stream file,
+                    IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             // Validate the arguments
-            if (client == null) throw new ArgumentNullException(nameof(client));
+            if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
             if (url == null) throw new ArgumentNullException(nameof(url));
             if (file == null) throw new ArgumentNullException(nameof(file));
 
             try
             {
-                var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                // Send a GET request to the url and get the response stream
-                using (response)
+                // Create an HttpClient instance using IHttpClientFactory
+                var httpClient = clientFactory.CreateClient();
+
+                using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                 {
+                    // Send a GET request to the url and get the response stream
                     response.EnsureSuccessStatusCode();
+                    // Get the content length from the response headers
                     contentLength = response.Content.Headers.ContentLength ?? 0;
+
                     using (var responseStream = await response.Content.ReadAsStreamAsync())
                     {
                         // Copy the response stream to the file stream using the custom extension method
