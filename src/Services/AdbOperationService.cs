@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.DeviceCommands;
@@ -15,22 +18,27 @@ namespace HuaweiHMSInstaller.Services
 {
     public class AdbOperationService : IAdbOperationService
     {
+        // Declare a boolean flag to store the network availability
+        private bool _isNetworkAvailable = true;
         // Use constants or configuration values for the URL and the destination folder
         private const string AdbUrl = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip";
         private const string AdbFolder = "adb_server";
 
         // Dependency injection to create HttpClient, AdbClient, Options instances
-        private readonly HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClient;
         private readonly AdbClient _adbClient;
         private readonly GlobalOptions _options;
 
         public AdbOperationService(
-                            HttpClient httpClient, 
+                            IHttpClientFactory httpClient, 
                             IOptions<GlobalOptions> options)
         {
             _adbClient = new AdbClient();
             _options = options.Value;
             _httpClient = httpClient;
+
+            NetworkChange.NetworkAvailabilityChanged += OnNetworkAvailabilityChanged;
+
 
         }
         public bool CheckAdbServer()
@@ -72,8 +80,25 @@ namespace HuaweiHMSInstaller.Services
             // Create a file stream to store the downloaded data
             using (var file = new FileStream(Path.Combine(_options.ProjectOperationPath, apkName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
-                // Download the file using the custom extension method
-                await _httpClient.DownloadAsync(apkUrl, file, progress);
+                // Add try-catch block to handle NetworkErrorException
+                try
+                {
+                    // Download the file using the custom extension method
+                    await _httpClient.DownloadAsync(apkUrl, file, progress);
+
+                    // Check the network availability flag before completing the download
+                    if (!_isNetworkAvailable)
+                    {
+                        // Cancel the download and notify the user
+                        Debug.WriteLine("Internet connection lost during download.");
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Cancel the download and notify the user
+                    Debug.WriteLine("Network error occurred: " + ex.Message);
+                }
             }
         }
         public void InstallApkToDevice(string packageFilePath, ProgressHandler InstallProgressChanged, DeviceData device)
@@ -81,9 +106,23 @@ namespace HuaweiHMSInstaller.Services
             PackageManager manager = new PackageManager(_adbClient, device);
             manager.InstallProgressChanged += InstallProgressChanged;
             // Install the APK
-            manager.InstallPackage(packageFilePath, true);
+            try
+            {
+                manager.InstallPackage(packageFilePath, false);
+
+            }catch(PackageInstallationException ex)
+            {
+                Debug.WriteLine(ex.Message);
+            }
 
         }
 
+
+        // Define a handler for the NetworkAvailabilityChanged event
+        private void OnNetworkAvailabilityChanged(object sender, NetworkAvailabilityEventArgs e)
+        {
+            // Update the flag based on the network availability
+            _isNetworkAvailable = e.IsAvailable;
+        }
     }
 }
