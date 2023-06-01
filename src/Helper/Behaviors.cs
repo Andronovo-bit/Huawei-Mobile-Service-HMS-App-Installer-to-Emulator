@@ -1,4 +1,6 @@
-﻿namespace HuaweiHMSInstaller.Helper
+﻿using LocalizationResourceManager.Maui;
+
+namespace HuaweiHMSInstaller.Helper
 {
     internal class DotAnimationBehavior : Behavior
     {
@@ -36,10 +38,13 @@
         private Label _label;
         private int _count = 3;
         private bool IsClosedEnv {get;set;}
+        private readonly ILocalizationResourceManager _localizationResourceManager;
+
 
         public CountDownBehavior(bool isClosedEnv)
         {
             IsClosedEnv = isClosedEnv;
+            _localizationResourceManager = Services.ServiceProvider.GetService<ILocalizationResourceManager>();
         }
         
         protected override void OnAttachedTo(BindableObject bindable)
@@ -53,7 +58,7 @@
                 _count--;
                 if (_count == -1 && IsClosedEnv)
                 {
-                    _label.Text = "Bye Bye";
+                    _label.Text = _localizationResourceManager.GetValue("bye_bye");
                     // close application after 1 second use dispatcher
                     Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
                     {
