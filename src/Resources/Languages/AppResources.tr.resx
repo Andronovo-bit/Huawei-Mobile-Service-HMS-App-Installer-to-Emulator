@@ -201,4 +201,31 @@
   <data name="finishing" xml:space="preserve">
     <value>Tamamlanıyor</value>
   </data>
+  <data name="step_1" xml:space="preserve">
+    <value>Adım 1</value>
+  </data>
+  <data name="hms_info_message_1" xml:space="preserve">
+    <value>Huawei Mobile Services (HMS), Huawei tarafından akıllı telefonları ve diğer cihazları için geliştirilen bir mobil hizmetler paketidir.</value>
+  </data>
+  <data name="hms_info_message_2" xml:space="preserve">
+    <value>HMS 170'ten fazla ülke ve bölgede mevcuttur ve dünya çapında 700 milyondan fazla kullanıcı tarafından kullanılmaktadır.</value>
+  </data>
+  <data name="hms_info_message_3" xml:space="preserve">
+    <value>Huawei, HMS ekosistemini sürekli olarak genişletiyor ve kullanıcılarına yeni ve yenilikçi hizmetler sunmak için çalışıyor.</value>
+  </data>
+  <data name="hms_info_message_4" xml:space="preserve">
+    <value>HMS, çoğu Android akıllı telefon tarafından kullanılan mobil hizmetler paketi olan Google Mobil Hizmetlerine (GMS) güvenli ve güvenilir bir alternatif olarak tasarlanmıştır.</value>
+  </data>
+  <data name="hms_info_message_5" xml:space="preserve">
+    <value>HMS, AppGallery uygulama mağazası, Huawei Cloud bulut depolama hizmeti ve Huawei Health fitness izleme hizmeti gibi çeşitli hizmetler içerir.</value>
+  </data>
+  <data name="step_2" xml:space="preserve">
+    <value>Adım 2</value>
+  </data>
+  <data name="hms" xml:space="preserve">
+    <value>Huawei Mobil Hizmeti</value>
+  </data>
+  <data name="bye_bye" xml:space="preserve">
+    <value>Hoşça kalın</value>
+  </data>
 </root>

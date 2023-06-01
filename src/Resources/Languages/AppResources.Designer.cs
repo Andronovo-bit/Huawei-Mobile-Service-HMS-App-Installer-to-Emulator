@@ -70,6 +70,15 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Bye Bye.
+        /// </summary>
+        internal static string bye_bye {
+            get {
+                return ResourceManager.GetString("bye_bye", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         internal static string cancel {
@@ -178,6 +187,60 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Huawei Mobile Service.
+        /// </summary>
+        internal static string hms {
+            get {
+                return ResourceManager.GetString("hms", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Huawei Mobile Services (HMS) is a suite of mobile services developed by Huawei for its smartphones and other devices..
+        /// </summary>
+        internal static string hms_info_message_1 {
+            get {
+                return ResourceManager.GetString("hms_info_message_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HMS is available in over 170 countries and regions, and it is used by over 700 million users worldwide..
+        /// </summary>
+        internal static string hms_info_message_2 {
+            get {
+                return ResourceManager.GetString("hms_info_message_2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Huawei is constantly expanding the HMS ecosystem, and it is working to bring new and innovative services to its users..
+        /// </summary>
+        internal static string hms_info_message_3 {
+            get {
+                return ResourceManager.GetString("hms_info_message_3", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HMS is designed to be a secure and reliable alternative to Google Mobile Services (GMS), which is the suite of mobile services that is used by most Android smartphones..
+        /// </summary>
+        internal static string hms_info_message_4 {
+            get {
+                return ResourceManager.GetString("hms_info_message_4", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to HMS includes a variety of services, such as the AppGallery app store, the Huawei Cloud cloud storage service, and the Huawei Health fitness tracking service..
+        /// </summary>
+        internal static string hms_info_message_5 {
+            get {
+                return ResourceManager.GetString("hms_info_message_5", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Huawei Emulator Installer.
         /// </summary>
         internal static string huawei_emulator_installer {
@@ -273,6 +336,24 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         internal static string search_games {
             get {
                 return ResourceManager.GetString("search_games", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Step 1.
+        /// </summary>
+        internal static string step_1 {
+            get {
+                return ResourceManager.GetString("step_1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Step 2.
+        /// </summary>
+        internal static string step_2 {
+            get {
+                return ResourceManager.GetString("step_2", resourceCulture);
             }
         }
         
