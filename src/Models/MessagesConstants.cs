@@ -40,10 +40,10 @@ namespace HuaweiHMSInstaller.Models
                 { DownloadingADBDriver, true },
                 { InstallingADBDriver, true },
                 { DownloadingHMSCore, true },
-                { InstallingHMSCore, true },
                 { DownloadingHMSAppGallery, true },
-                { InstallingHMSAppGallery, true },
                 { DownloadingGame, true },
+                { InstallingHMSCore, true },
+                { InstallingHMSAppGallery, true },
                 { InstallingGame, true },
                 { Finishing, true }
             };
