@@ -201,4 +201,31 @@
   <data name="finishing" xml:space="preserve">
     <value>Finishing</value>
   </data>
+  <data name="step_1" xml:space="preserve">
+    <value>Step 1</value>
+  </data>
+  <data name="hms_info_message_1" xml:space="preserve">
+    <value>Huawei Mobile Services (HMS) is a suite of mobile services developed by Huawei for its smartphones and other devices.</value>
+  </data>
+  <data name="hms_info_message_2" xml:space="preserve">
+    <value>HMS is available in over 170 countries and regions, and it is used by over 700 million users worldwide.</value>
+  </data>
+  <data name="hms_info_message_3" xml:space="preserve">
+    <value>Huawei is constantly expanding the HMS ecosystem, and it is working to bring new and innovative services to its users.</value>
+  </data>
+  <data name="hms_info_message_4" xml:space="preserve">
+    <value>HMS is designed to be a secure and reliable alternative to Google Mobile Services (GMS), which is the suite of mobile services that is used by most Android smartphones.</value>
+  </data>
+  <data name="hms_info_message_5" xml:space="preserve">
+    <value>HMS includes a variety of services, such as the AppGallery app store, the Huawei Cloud cloud storage service, and the Huawei Health fitness tracking service.</value>
+  </data>
+  <data name="step_2" xml:space="preserve">
+    <value>Step 2</value>
+  </data>
+  <data name="hms" xml:space="preserve">
+    <value>Huawei Mobile Service</value>
+  </data>
+  <data name="bye_bye" xml:space="preserve">
+    <value>Bye Bye</value>
+  </data>
 </root>

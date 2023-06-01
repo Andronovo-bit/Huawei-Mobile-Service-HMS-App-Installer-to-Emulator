@@ -4,16 +4,29 @@
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              xmlns:popup ="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
              Title="Huawei Emulator Installer"
-             BackgroundImageSource="huawei_background.png"
+             BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.Pages.ThanksPage">
 
     <ContentPage.Resources>
         <x:String x:Key="finish">&#xf11e;</x:String>
         <x:String x:Key="back">&#xf30a;</x:String>
     </ContentPage.Resources>
-    <ContentView>
+    <ContentView x:Name="contnetView">
 
         <Grid>
+            <Grid.Resources>
+                <Style x:Key="TitleLabelStyle" TargetType="Label">
+                    <Setter Property="FontSize" Value="Header"/>
+                    <Setter Property="TextColor" Value="White"/>
+                    <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                    <Setter Property="VerticalTextAlignment" Value="Center"/>
+                    <Setter Property="Margin" Value="0"/>
+                    <Setter Property="Shadow">
+                        <Shadow Brush="Black" Offset="100,-50" Radius="10" Opacity="0.5"/>
+                    </Setter>
+                </Style>
+            </Grid.Resources>
+            
             <VerticalStackLayout
                 Spacing="0"
                 Padding="0"
@@ -22,22 +35,17 @@
                 <Label 
                     x:Name="TitleWelcome"
                     Text="{loc:Translate thanks_for_installing}"
-                    FontSize="Header"
-                    FontAttributes="None"
+                    Style="{StaticResource TitleLabelStyle}"
                     TextColor="White"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
                     Margin="0,0,0,0"/>
 
                 <!-- Use auto sizing for the label height and width -->
                 <Label 
                     x:Name="TitleEmulator"
+                    Style="{StaticResource TitleLabelStyle}"
                     Text="{loc:Translate huawei_emulator_installer}"
-                    FontSize="Header"
                     FontAttributes="Bold"
                     TextColor="White"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
                     Margin="0,0,0,0"/>
 
                 <!-- Add more elements here as needed -->
@@ -46,12 +54,12 @@
 
 
             <Grid
-            Padding="0"
-            BackgroundColor="#17181d"
-            VerticalOptions="End">
+                Padding="0"
+                BackgroundColor="#17181d"
+                VerticalOptions="End">
                 <Label 
                     x:Name="VersionNum"
-                    Text="Step 2"
+                    Text="{loc:Translate step_2}"
                     FontSize="Medium"
                     FontAttributes="None"
                     TextColor="#7f8895"

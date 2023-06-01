@@ -22,7 +22,6 @@ public static class MauiProgram
             {
                 settings.RestoreLatestCulture(true);
                 settings.AddResource(AppResources.ResourceManager);
-                settings.InitialCulture(new System.Globalization.CultureInfo("en-Us"));
             })
             .ConfigureFonts(fonts =>
             {
