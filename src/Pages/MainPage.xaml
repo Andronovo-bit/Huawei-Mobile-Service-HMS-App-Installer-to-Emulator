@@ -35,7 +35,7 @@
                         <Setter Property="VerticalTextAlignment" Value="Center"/>
                         <Setter Property="Margin" Value="0"/>
                         <Setter Property="Shadow">
-                            <Shadow Brush="Black" Offset="20,20" Radius="40" Opacity="0.8"/>
+                            <Shadow Brush="Black" Offset="-10,25" Radius="10" Opacity="0.5"/>
                         </Setter>
                     </Style>
                 </Grid.Resources>
@@ -97,7 +97,11 @@
                        TextChanged="SearchBar_TextChanged" 
                        MaxLength="50" 
                        TextColor="WhiteSmoke"
-                       MaximumWidthRequest="500"></SearchBar>
+                       MaximumWidthRequest="500">
+                        <SearchBar.Shadow>
+                            <Shadow Brush="{StaticResource BlackBrush}" Offset="20,20" Radius="7" Opacity="0.5"/>
+                        </SearchBar.Shadow>
+                    </SearchBar>
 
                     <Grid x:Name="SearchLoader" Padding="5" BackgroundColor ="Transparent" WidthRequest ="100" HeightRequest ="100" IsVisible ="false">
                         <core:SfBusyIndicator Title ="Searching..." TextColor ="WhiteSmoke" FontAttributes ="Bold" Grid.Row ="0" Grid.Column ="0"  HorizontalOptions ="Center" VerticalOptions ="Center" IsRunning ="True" IndicatorColor ="#ed1c24"/>
@@ -155,7 +159,7 @@
 
                 <Label 
                     x:Name="HMSInfoLabel"
-                    Text="HMS CORE"
+                    Text="{loc:Translate hms}"
                     FontSize="Small"
                     FontAttributes="None"
                     TextColor="#7f8895"

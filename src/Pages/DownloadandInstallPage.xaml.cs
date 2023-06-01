@@ -15,12 +15,12 @@ public partial class DownloadandInstallPage : ContentPage
 {
     #region Definations
     private const string AdbFolder = "adb_server";
-	// Define an array of messages for each progress range
-	private readonly Dictionary<string, bool> AdbProgressMessages = AdbMessagesConst.Messages;
-	private readonly string[] hmsInfoMessage = HmsInfoMessagesConst.hmsInfoMessage;
+    // Define an array of messages for each progress range
+    private Dictionary<string, bool> AdbProgressMessages;
+    private string[] hmsInfoMessage;
 	// Define an array of progress thresholds for each message
 	private int[] thresholds;
-	private readonly double[] thresholdsHmsInfo = new double[] { 20, 40, 60, 80, 101 };
+	private readonly double[] thresholdsHmsInfo = new double[] { 20, 40, 60, 70, 80 };
 	// Initialize variables to keep track of the current message index
 	private int index = 0;
 	private int indexHmsInfo = 0;
@@ -41,32 +41,41 @@ public partial class DownloadandInstallPage : ContentPage
 
     #endregion
 
-    private readonly IAdbOperationService adbOperationService;
+    private readonly IAdbOperationService _adbOperationService;
 	private readonly GlobalOptions _options;
     private readonly ILocalizationResourceManager _localizationResourceManager;
 
     public DownloadandInstallPage(SearchListItem item)
 	{
-		adbOperationService = ServiceProvider.GetService<IAdbOperationService>();
+        _adbOperationService = ServiceProvider.GetService<IAdbOperationService>();
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
-
         _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
+
         GameItem = item;
         InstallGame = $"https://appgallery.cloud.huawei.com/appdl/{GameItem.AppId}?";
         GameName = GameItem.Name;
 
-		InitializeComponent();
+        InitializeComponent();
+        Init();
 
-		ThresholdOperation();
+    }
 
+    private void Init()
+    {
+
+        //this.mainGrid.BackgroundColor = Color.FromRgba(0, 0, 0, 0.50);
+
+        AdbProgressMessages = AdbMessagesConst.InitializeMessages();
+        hmsInfoMessage = HmsInfoMessagesConst.InitializeMessages();
+
+        ThresholdOperation();
         adbPath = Path.Combine(_options.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
 
-		Dispatcher.DispatchAsync(async () =>
-		{
-			await DownloadAndInstallOperationAsync();
-		});
-	}
-
+        Dispatcher.DispatchAsync(async () =>
+        {
+            await DownloadAndInstallOperationAsync();
+        });
+    }
 	private async Task DownloadAndInstallOperationAsync(){
 
 		//label add ... animation use behavior
@@ -76,7 +85,7 @@ public partial class DownloadandInstallPage : ContentPage
 
 		if (adbServerCheck)
 		{
-			var adbDevices = await adbOperationService.GetDevices();
+			var adbDevices = await _adbOperationService.GetDevices();
 			if (adbDevices is null or { Count: 0 })
 			{
 				await AlertForNotHaveAdbDevices();
@@ -122,11 +131,11 @@ public partial class DownloadandInstallPage : ContentPage
 			this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
 		});
 
-		var adbServerCheck = adbOperationService.CheckAdbServer();
+		var adbServerCheck = _adbOperationService.CheckAdbServer();
 
 		if (!adbServerCheck)
 		{
-			await adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
+			await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
 			var checkDownload = File.Exists(adbPath);
 			if (checkDownload)
 			{
@@ -205,6 +214,7 @@ public partial class DownloadandInstallPage : ContentPage
         {
             index++;
         }
+        if (thresholdsHmsInfo.Length == indexHmsInfo) return;
         if (globalProgress >= thresholdsHmsInfo[indexHmsInfo] / 100f)
         {
             indexHmsInfo++;
@@ -261,7 +271,6 @@ public partial class DownloadandInstallPage : ContentPage
     #region DownloadHMSApps
     private async Task DownloadHMSApps()
     {
-        //var progressValues = new double[] { 0.10, 0.20, 0.30 };
         var apkUrls = new string[] { HmsCore, AppGallery, InstallGame };
         var constantMessage = new string[] { AdbMessagesConst.DownloadingHMSCore, AdbMessagesConst.DownloadingHMSAppGallery, AdbMessagesConst.DownloadingGame };
         var apkNames = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{GameItem.AppId}.apk" };
@@ -291,7 +300,7 @@ public partial class DownloadandInstallPage : ContentPage
     }
     private async Task DownloadApk(string url, string fileName, IProgress<float> progress)
     {
-        await adbOperationService.DownloadApkFromInternetAsync(url, fileName, progress);
+        await _adbOperationService.DownloadApkFromInternetAsync(url, fileName, progress);
     }
     #endregion
 	
@@ -321,7 +330,7 @@ public partial class DownloadandInstallPage : ContentPage
     {
 		await Task.Run(() =>
 		{
-			adbOperationService.InstallApkToDevice(apkPath, InstallProgressChanged, device);
+            _adbOperationService.InstallApkToDevice(apkPath, InstallProgressChanged, device);
 		});
 
     }

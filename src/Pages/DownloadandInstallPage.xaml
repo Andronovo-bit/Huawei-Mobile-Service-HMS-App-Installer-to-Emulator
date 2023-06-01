@@ -4,64 +4,90 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              Title="Huawei Emulator Installer"
-             BackgroundImageSource="huawei_background.png"
+             BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
 
     <ContentPage.Resources>
         <x:String x:Key="Cancel">&#xf00d;</x:String>
     </ContentPage.Resources>
     
-    <Grid>
+    <Grid x:Name="mainGrid">
+        <Grid.Resources>
+            <Style x:Key="ShadowProgress" TargetType="ProgressBar">
+                <Setter Property="Shadow">
+                    <Shadow Brush="Black" Offset="20,20" Radius="10" Opacity="0.5"/>
+                </Setter>
+            </Style>
+            <Style x:Key="ShadowLabel" TargetType="Label">
+                <Setter Property="Shadow">
+                <Shadow Brush="Black" Offset="20,20" Radius="10" Opacity="0.5"/>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+        <!-- Define the rows and columns of the grid -->
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Place the body stack layout in the first row of the grid -->
         <VerticalStackLayout
-                x:Name="Body"
-                Spacing="0"
-                Padding="0"
-                VerticalOptions="Center">
+            x:Name="Body"
+            Spacing="0"
+            Padding="0"
+            VerticalOptions="Center"
+            Grid.Row="0"
+            Grid.Column="0">
 
             <StackLayout>
                 <Label 
-                    x:Name="TitleEmulator"
-                    Text="{loc:Translate downloading_and_installing}"
-                    FontSize="Header"
-                    FontAttributes="Bold"
-                    TextColor="White"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                Margin="10,10,10,20"/>
+                x:Name="TitleEmulator"
+                Text="{loc:Translate downloading_and_installing}"
+                Style="{StaticResource ShadowLabel}"
+                FontSize="Header"
+                FontAttributes="Bold"
+                TextColor="White"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+            Margin="10,10,10,20"/>
 
-                <ProgressBar x:Name="progressBar" Progress="0.00" ProgressColor="#ed1c24" ScaleX="4" ScaleY="2" MaximumWidthRequest="100" />
+                <ProgressBar x:Name="progressBar" Progress="0.00" ProgressColor="#ed1c24" ScaleX="4" ScaleY="2" MaximumWidthRequest="100" Style="{StaticResource ShadowProgress}"/>
                 <Grid HorizontalOptions="Center"
-                  VerticalOptions="Center"
-                  Margin="10,10,10,10">
+              VerticalOptions="Center"
+              Margin="10,10,10,10">
                     <FlexLayout AlignItems="Center" Direction="Column">
-                        <Label FontSize="Medium" Text="{Binding Source={x:Reference progressBar}, Path=Progress, StringFormat='{0:P0}'}" Margin="5" />
+                        <Label FontSize="Medium" Text="{Binding Source={x:Reference progressBar}, Path=Progress, StringFormat='{0:P0}'}" Margin="5" TextColor="White"/>
                         <Grid HorizontalOptions="Center" FlowDirection="MatchParent" VerticalOptions="Center">
                             <StackLayout FlowDirection="MatchParent" FlexLayout.AlignSelf="Center" FlexLayout.Basis="Auto" HorizontalOptions="Center" VerticalOptions="Center">
-                                <Label x:Name="commentLabel" Text=""/>
-                                <Label HorizontalOptions="Center" VerticalOptions="Center" x:Name="dotAnimation" Text="."/>
+                                <Label x:Name="commentLabel" Text="" TextColor="White" Style="{StaticResource ShadowLabel}" />
+                                <Label HorizontalOptions="Center" VerticalOptions="Center" x:Name="dotAnimation" Text="." TextColor="White" Style="{StaticResource ShadowLabel}"/>
                             </StackLayout>
                         </Grid>
                     </FlexLayout>
-                    
+
                 </Grid>
             </StackLayout>
-
-
 
             <!-- Add more elements here as needed -->
 
 
         </VerticalStackLayout>
 
+        <!-- Place the footer grid in the second row of the grid -->
         <Grid
             Padding="0"
             BackgroundColor="#17181d"
             MaximumHeightRequest="100"
-            VerticalOptions="End">
-            
+            VerticalOptions="End"
+            Grid.Row = "1"
+            Grid.Column = "0">
+
             <Label 
                 x:Name="VersionNum"
-                Text="Step 1"
+                Text="{loc:Translate step_1}"
                 FontSize="Medium"
                 FontAttributes="None"
                 TextColor="#7f8895"
@@ -71,35 +97,35 @@
 
             <Label 
                 x:Name="HMSInfoLabel"
-                Text="HMS CORE"
+                Text="{loc:Translate hms}"
                 FontSize="Small"
                 FontAttributes="None"
                 TextColor="#7f8895"
                 HorizontalOptions="Center"
                 VerticalOptions="Center"
-                MaximumWidthRequest="750"
-                Margin="10,10,10,20"/>
+                MaximumWidthRequest ="750"
+                Margin ="10,10,10,20"/>
             <Grid>
-                <StackLayout HorizontalOptions="End" MaximumWidthRequest="100">
+                <StackLayout HorizontalOptions ="End" MaximumWidthRequest ="100">
 
                     <Button
-                        x:Name="ButtonCancel"
-                        Text="{loc:Translate cancel}"
-                        FontSize="Default"
-                        FontAttributes="Bold"
-                        TextColor="NavajoWhite"
-                        BackgroundColor="#ed1c24"
-                        HorizontalOptions="Center"
-                        VerticalOptions="Center"
-                        Margin="10,10,10,10"
-                        IsVisible="false"
-                        Clicked="ButtonCancel_Clicked">
+                        x:Name ="ButtonCancel"
+                        Text ="{loc:Translate cancel}"
+                        FontSize ="Default"
+                        FontAttributes ="Bold"
+                        TextColor ="NavajoWhite"
+                        BackgroundColor ="#ed1c24"
+                        HorizontalOptions ="Center"
+                        VerticalOptions ="Center"
+                        Margin ="10,10,10,10"
+                        IsVisible ="false"
+                        Clicked ="ButtonCancel_Clicked">
                         <Button.ImageSource>
                             <FontImageSource
-                                FontFamily="FontSolid"
-                                Size="Medium"
-                                Glyph="{StaticResource Cancel}"
-                                Color="#ed1c24"/>
+                                FontFamily ="FontSolid"
+                                Size ="Medium"
+                                Glyph ="{StaticResource Cancel}"
+                                Color ="#ed1c24"/>
                         </Button.ImageSource>
                     </Button>
 
@@ -110,8 +136,6 @@
 
         </Grid>
 
-
     </Grid>
-
 
 </ContentPage>
