@@ -8,7 +8,7 @@
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              xmlns:vm="clr-namespace:HuaweiHMSInstaller.Models"
              Title="Huawei Emulator Installer"
-             BackgroundImageSource="huawei_background.png"
+             BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.MainPage">
 
 
@@ -16,58 +16,131 @@
         <x:String x:Key="install">&#xf019;</x:String>
     </ContentPage.Resources>
 
-    <ContentView>
+    <ContentView x:Name="contentView">
 
         <Grid x:Name="MainContentViewArea">
-            <Picker x:Name="langPicker" VerticalOptions="Start" HorizontalOptions="Start" MaximumWidthRequest="100" Margin="10,10,10,10" SelectedIndexChanged="langPicker_SelectedIndexChanged" >
-                <Picker.Items>
-                    <x:String>EN</x:String>
-                    <x:String>TR</x:String>
-                    <x:String>ES</x:String>
-                </Picker.Items>
-            </Picker>
 
-
-            <!-- Use a vertical stack layout to arrange the elements -->
-            <VerticalStackLayout
-                Spacing="10"
-                Padding="10"
+            <!-- Use a grid layout to arrange the elements -->
+            <Grid
                 Margin="0,20,0,0"
                 VerticalOptions="Start">
 
-                    <Label 
+                <!-- Define a style for the labels -->
+                <!-- Define a style for the labels -->
+                <Grid.Resources>
+                    <Style x:Key="TitleLabelStyle" TargetType="Label">
+                        <Setter Property="FontSize" Value="Header"/>
+                        <Setter Property="TextColor" Value="White"/>
+                        <Setter Property="HorizontalTextAlignment" Value="Center"/>
+                        <Setter Property="VerticalTextAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="Shadow">
+                            <Shadow Brush="Black" Offset="20,20" Radius="40" Opacity="0.8"/>
+                        </Setter>
+                    </Style>
+                </Grid.Resources>
+
+                <!-- Define the rows and columns of the grid -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Place the picker in the top left corner of the grid -->
+                <Picker x:Name="langPicker" VerticalOptions="Start" HorizontalOptions="Start" MaximumWidthRequest="100" Margin="10,10,10,10" SelectedIndexChanged="langPicker_SelectedIndexChanged" Grid.Row="0" Grid.Column="0">
+                    <Picker.Items>
+                        <x:String>EN</x:String>
+                        <x:String>TR</x:String>
+                        <x:String>ES</x:String>
+                    </Picker.Items>
+                </Picker>
+
+                <!-- Apply the style to the labels and place them in the grid cells -->
+                <Label 
                     x:Name="TitleWelcome"
                     Text="{loc:Translate welcome_to}"
-                    FontSize="Header"
+                    Style="{StaticResource TitleLabelStyle}"
                     FontAttributes="None"
-                    TextColor="White"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    Margin="0,0,0,0"/>
+                    Margin="0,0,75,0"
+                    Grid.Row="0"
+                    Grid.Column="1"/>
 
-                    <!-- Use auto sizing for the label height and width -->
-                    <Label 
+                <Label 
                     x:Name="TitleEmulator"
                     Text="{loc:Translate huawei_emulator_installer}"
-                    FontSize="Header"
+                    Style="{StaticResource TitleLabelStyle}"
                     FontAttributes="Bold"
-                    TextColor="White"
-                    HorizontalOptions="Center"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"/>
+
+                <!-- Place the search bar stack layout in the third row of the grid -->
+                <StackLayout x:Name="searchBarStackLayout"
+                    Margin="10,30,10,10"
+                    Orientation="Vertical"
+                    HorizontalOptions="CenterAndExpand"
                     VerticalOptions="Center"
-                    Margin="0,0,0,0"/>
+                    MinimumWidthRequest="300"
+                    Grid.Row = "2"
+                    Grid.ColumnSpan = "2">
 
-                    <!-- Add more elements here as needed -->
+                    <!-- Add the search bar and other elements as before -->
+                    <SearchBar x:Name="searchBar"     
+                       FontAutoScalingEnabled="True" 
+                       PlaceholderColor="White"
+                       Placeholder="{loc:Translate search_games}" 
+                       SearchButtonPressed="SearchBarPressedAsync" 
+                       TextChanged="SearchBar_TextChanged" 
+                       MaxLength="50" 
+                       TextColor="WhiteSmoke"
+                       MaximumWidthRequest="500"></SearchBar>
+
+                    <Grid x:Name="SearchLoader" Padding="5" BackgroundColor ="Transparent" WidthRequest ="100" HeightRequest ="100" IsVisible ="false">
+                        <core:SfBusyIndicator Title ="Searching..." TextColor ="WhiteSmoke" FontAttributes ="Bold" Grid.Row ="0" Grid.Column ="0"  HorizontalOptions ="Center" VerticalOptions ="Center" IsRunning ="True" IndicatorColor ="#ed1c24"/>
+                    </Grid>
+
+                    <Grid x:Name="SearchListFrameGrid">
+                    </Grid>
+                    <Label x:Name="selectedItemLabel"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        TextColor="White"
+                        FontSize="12"
+                        FontAttributes="Bold"
+                        FontAutoScalingEnabled="True"
+                        Margin="0,10,0,0"
+                        MaximumHeightRequest="300"
+                        HorizontalTextAlignment="Center"
+                        VerticalTextAlignment="Center"
+                    ></Label>
+
+                </StackLayout>
+
+            </Grid>
 
 
-            </VerticalStackLayout>
-
-            <Grid
-                x:Name="gridFooter"
+            <Grid x:Name="gridFooter"
                 Padding="0"
                 BackgroundColor="#17181d"
                 VerticalOptions="End">
 
 
+                <!-- Define the rows and columns of the grid -->
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Place the labels and the button in the grid cells -->
                 <Label 
                     x:Name="VersionNum"
                     Text="Version: 0.0.1"
@@ -76,7 +149,9 @@
                     TextColor="#7f8895"
                     HorizontalOptions="Start"
                     VerticalOptions="Center"
-                    Margin="10,0,0,0"/>
+                    Margin="10,0,0,0"
+                    Grid.Row="0"
+                    Grid.Column="0"/>
 
                 <Label 
                     x:Name="HMSInfoLabel"
@@ -87,9 +162,10 @@
                     HorizontalOptions="Center"
                     VerticalOptions="Center"
                     MaximumWidthRequest="750"
-                    Margin="10,10,10,20"/>
+                    Margin="10,10,10,20"
+                    Grid.Row="0"
+                    Grid.ColumnSpan="2"/>
 
-                <StackLayout x:Name="stackLayout">
                 <Button
                     x:Name="ButtonInstall"
                     Text="{loc:Translate install}"
@@ -102,54 +178,25 @@
                     Margin="10,10,10,10"
                     IsEnabled="False"
                     Opacity="0.5"
-                    Clicked="OnInstallButtonClicked">
+                    Clicked="OnInstallButtonClicked" 
+                    Grid.Row="0" 
+                    Grid.Column="0">
+
                     <Button.ImageSource>
                         <FontImageSource
-                                FontFamily="FontSolid"
-                                Size="Medium"
-                                Glyph="{StaticResource install}"
-                                Color="White"/>
+                            FontFamily="FontSolid"
+                            Size="Medium"
+                            Glyph="{StaticResource install}"
+                            Color="White"/>
                     </Button.ImageSource>
+
                 </Button>
 
                 <!-- Add more elements here as needed -->
-            </StackLayout>
-        </Grid>
 
-            <StackLayout x:Name="searchBarStackLayout"
-                Margin="10,10,10,10"
-                Orientation="Vertical"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                MinimumWidthRequest="300">
+            </Grid>
 
-                <SearchBar x:Name="searchBar" FontAutoScalingEnabled="True" Placeholder="{loc:Translate search_games}" SearchButtonPressed="SearchBarPressedAsync" TextChanged="SearchBar_TextChanged" MaxLength="50" MaximumWidthRequest="500"></SearchBar>
 
-                <Grid x:Name="SearchLoader" Padding="5" Background="Transparent" WidthRequest="100" HeightRequest="100" IsVisible="false">
-                    <core:SfBusyIndicator Title="Searching..." TextColor="WhiteSmoke" FontAttributes="Bold" Grid.Row="0" Grid.Column="0"  HorizontalOptions="Center" VerticalOptions="Center" IsRunning="True" IndicatorColor="#ed1c24"/>
-                </Grid>
-
-                <Grid x:Name="SearchListFrameGrid">
-                    <!--<Frame x:Name="SearchListFrame"
-                    BorderColor="WhiteSmoke"
-                    CornerRadius="10"
-                    BackgroundColor="Transparent"
-                    IsVisible="false"
-                    Margin="0,10,0,0"></Frame>-->
-                </Grid>
-                <Label x:Name="selectedItemLabel"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Center"
-                    TextColor="White"
-                    FontSize="12"
-                    FontAutoScalingEnabled="True"
-                    Margin="0,10,0,0"
-                    MaximumHeightRequest="300"
-                    HorizontalTextAlignment="Center"
-                    VerticalTextAlignment="Center"
-                    ></Label>
-
-            </StackLayout>
 
         </Grid>
 

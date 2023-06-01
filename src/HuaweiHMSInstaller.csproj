@@ -60,6 +60,8 @@
 	  <None Remove="Resources\Fonts\FA-Free-Regular-400.otf" />
 	  <None Remove="Resources\Fonts\FA-Free-Solid-900.otf" />
 	  <None Remove="Resources\Images\huawei_background.png" />
+	  <None Remove="Resources\Images\huawei_background2.jpg" />
+
 	</ItemGroup>
 
 

@@ -5,7 +5,6 @@ using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
 using LocalizationResourceManager.Maui;
 using Microsoft.Maui.Controls.Shapes;
-using Microsoft.Maui.Platform;
 using Syncfusion.Maui.Popup;
 using System.Collections.ObjectModel;
 using Path = Microsoft.Maui.Controls.Shapes.Path;
@@ -27,10 +26,17 @@ public partial class MainPage : ContentPage
 
     public MainPage()
     {
-        InitializeComponent();
         _appGalleryService = ServiceProvider.GetService<IAppGalleryService>();
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
-        this.langPicker.SelectedItem =  _localizationResourceManager.CurrentCulture.TwoLetterISOLanguageName.ToUpper();
+        InitializeComponent();
+        Init();
+    }
+
+    private void Init()
+    {
+        this.langPicker.SelectedItem = _localizationResourceManager.CurrentCulture.TwoLetterISOLanguageName.ToUpper();
+        this.searchBar.BackgroundColor = Color.FromRgba(255, 255, 255, 0.1);
+        this.SearchListFrameGrid.BackgroundColor = Color.FromRgba(255, 255, 255, 0.05);
     }
 
     private async void OnInstallButtonClicked(object sender, EventArgs e)
@@ -137,7 +143,7 @@ public partial class MainPage : ContentPage
                     if (!popup.IsOpen) return false;
                     popup.IsOpen = false;
                     popup.Dismiss();
-                    this.stackLayout.Children.Remove(popup);
+                    stackLayout.Children.Remove(popup);
                     Application.Current.MainPage.Navigation.PushModalAsync(new DownloadandInstallPage(SelectedItem), true);
                     return false;
                 });
@@ -265,25 +271,6 @@ public partial class MainPage : ContentPage
                 WidthRequest = 100,
                 HeightRequest = 50,
                 Margin = new Thickness(0, 0, 0, 10)
-                //Style = new Style(typeof(Button))
-                //{
-                //    Setters =
-                //    {
-                //        new Setter { Property = Button.BorderWidthProperty, Value = 1 },
-                //        new Setter { Property = Button.BorderColorProperty, Value = Color.FromArgb("#ed1c24") },
-                //        new Setter { Property = Button.FontSizeProperty, Value = 20 },
-                //        new Setter { Property = Button.FontFamilyProperty, Value = "Arial" },
-                //        new Setter { Property = Button.FontAttributesProperty, Value = FontAttributes.Bold },
-                //        new Setter { Property = Button.HorizontalOptionsProperty, Value = LayoutOptions.Center },
-                //        new Setter { Property = Button.VerticalOptionsProperty, Value = LayoutOptions.Center },
-                //        new Setter { Property = Button.WidthRequestProperty, Value = 100 },
-                //        new Setter { Property = Button.HeightRequestProperty, Value = 50 },
-                //        new Setter { Property = Button.MarginProperty, Value = new Thickness(0, 0, 0, 10) },
-                //        new Setter { Property = Button.BackgroundColorProperty, Value = Color.FromArgb("#ed1c24") },
-                //        new Setter { Property = Button.TextColorProperty, Value = Color.FromArgb("#ffffff") },
-                //        new Setter { Property = Button.IsVisibleProperty, Value = false },
-                //    }
-                //}
             };
             return footerButton;
         });
@@ -389,6 +376,7 @@ public partial class MainPage : ContentPage
             ItemsSource = FilteredItems,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Default,
             MaximumHeightRequest = 200,
+            
 
         };
 
@@ -423,13 +411,21 @@ public partial class MainPage : ContentPage
             // Create an Image object and bind its Source property to the ImageUrl property of the data model
             var image = new Image();
             image.MaximumWidthRequest = 35;
-            image.Margin = new Thickness(5);
+            image.Margin = new Thickness(5,5,10,5);
             image.SetBinding(Image.SourceProperty, "ImageUrl");
 
             // Create a Label object and bind its Text property to the Name property of the data model
             var label = new Label();
             label.VerticalOptions = LayoutOptions.Center;
             label.HorizontalOptions = LayoutOptions.Center;
+            label.TextColor = Colors.White;
+            label.Shadow = new Shadow
+            {
+                Brush = new SolidColorBrush(Colors.Black),
+                Opacity = 1f,
+                Offset = new Point(25, 25),
+                Radius =20
+            };
             label.SetBinding(Label.TextProperty, "Name");
 
             // Create a StackLayout object to arrange the image and label horizontally
@@ -475,12 +471,12 @@ public partial class MainPage : ContentPage
             SearchListFrame.IsVisible = false;
         }
     }
-
     private void langPicker_SelectedIndexChanged(object sender, EventArgs e)
     {
         var picker = sender as Picker;
 
         _localizationResourceManager.CurrentCulture = new System.Globalization.CultureInfo(picker.SelectedItem.ToString());
+        
     }
 }
 
