@@ -4,7 +4,6 @@ using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
 using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Options;
-using System.Diagnostics;
 using System.Text;
 using static AdvancedSharpAdbClient.DeviceCommands.PackageManager;
 using ServiceProvider = HuaweiHMSInstaller.Services.ServiceProvider;
@@ -89,7 +88,6 @@ public partial class DownloadandInstallPage : ContentPage
 			if (adbDevices is null or { Count: 0 })
 			{
 				await AlertForNotHaveAdbDevices();
-				//return false;
 			}else{
 				await DownloadHMSApps();
 				await InstallHmsAppsAsync(adbDevices.First());
@@ -97,12 +95,10 @@ public partial class DownloadandInstallPage : ContentPage
 				await Task.Delay(2000);
                 await Application.Current.MainPage.Navigation.PushModalAsync(new ThanksPage(), true);
             }
-
 		}
 	}
 	private async Task<bool> AdbServerOperationAsync()
 	{
-
 		IProgress<float> progressAdb = new Progress<float>(value =>
 		{
 			var realValue = (value / thresholds.Length)*2;
@@ -130,10 +126,8 @@ public partial class DownloadandInstallPage : ContentPage
 			hmsInfoBuilder.Append(hmsInfoMessage[indexHmsInfo]);
 			this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
 		});
-
 		var adbServerCheck = _adbOperationService.CheckAdbServer();
-
-		if (!adbServerCheck)
+        if (!adbServerCheck)
 		{
 			await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
 			var checkDownload = File.Exists(adbPath);
@@ -143,20 +137,19 @@ public partial class DownloadandInstallPage : ContentPage
 				if(status == StartServerResult.Started ||status == StartServerResult.AlreadyRunning)
 				{
 					adbServerCheck = true;
+                    _adbOperationService.CreateAdbClient();
                 }
 			}
 
 		}
 		else
 		{
+            _adbOperationService.CreateAdbClient();
             AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
             AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
             ThresholdOperation();
         }
-
 		return adbServerCheck;
-
- 
 	}
 	private async Task AlertForNotHaveAdbDevices()
 	{

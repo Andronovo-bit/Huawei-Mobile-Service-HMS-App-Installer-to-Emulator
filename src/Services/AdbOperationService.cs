@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.IO.Compression;
-using System.Linq;
+using System.Net;
 using System.Net.NetworkInformation;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using AdvancedSharpAdbClient;
 using AdvancedSharpAdbClient.DeviceCommands;
 using HuaweiHMSInstaller.Helper;
@@ -23,27 +18,48 @@ namespace HuaweiHMSInstaller.Services
         // Use constants or configuration values for the URL and the destination folder
         private const string AdbUrl = "https://dl.google.com/android/repository/platform-tools-latest-windows.zip";
         private const string AdbFolder = "adb_server";
+        private const string ADB = "adb";
 
         // Dependency injection to create HttpClient, AdbClient, Options instances
         private readonly IHttpClientFactory _httpClient;
-        private readonly AdbClient _adbClient;
+        private AdbClient _adbClient;
         private readonly GlobalOptions _options;
 
         public AdbOperationService(
                             IHttpClientFactory httpClient, 
                             IOptions<GlobalOptions> options)
         {
-            _adbClient = new AdbClient();
             _options = options.Value;
             _httpClient = httpClient;
-
             NetworkChange.NetworkAvailabilityChanged += OnNetworkAvailabilityChanged;
+        }
+        public void CreateAdbClient()
+        {
+            var adbPortNumber = WorkingProcessAndPort.GetProcessPortNumber(WorkingProcessAndPort.GetProcessByName(ADB).Id);
 
+            if (adbPortNumber != null && adbPortNumber != AdbClient.AdbServerPort)
+            {
+                var endPoint = new IPEndPoint(IPAddress.Loopback, (int)adbPortNumber);
+                var adbSocketFactory = Factories.AdbSocketFactory;
+                _adbClient = new AdbClient(endPoint, adbSocketFactory);
+                return;
+            }
+
+            _adbClient = new AdbClient();
 
         }
         public bool CheckAdbServer()
         {
-            return AdbServer.Instance.GetStatus().IsRunning;
+            try
+            {
+                return AdbServer.Instance.GetStatus().IsRunning;
+
+            }catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return false;
+            }
+            
         }
         // A public method that downloads and extracts the adb file
         public async Task DownloadAdbFromInternetAsync(IProgress<float> progress = null)
@@ -116,8 +132,6 @@ namespace HuaweiHMSInstaller.Services
             }
 
         }
-
-
         // Define a handler for the NetworkAvailabilityChanged event
         private void OnNetworkAvailabilityChanged(object sender, NetworkAvailabilityEventArgs e)
         {
