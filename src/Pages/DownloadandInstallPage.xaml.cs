@@ -14,6 +14,7 @@ public partial class DownloadandInstallPage : ContentPage
 {
     #region Definations
     private const string AdbFolder = "adb_server";
+    private const long AdbFileSize = 5938176;
     // Define an array of messages for each progress range
     private Dictionary<string, bool> AdbProgressMessages;
     private string[] hmsInfoMessage;
@@ -29,6 +30,7 @@ public partial class DownloadandInstallPage : ContentPage
 	private StringBuilder hmsInfoBuilder = new ();
 
 	private string adbPath;
+	private string adbFolderPath;
 	//HMS Links
 	private const string AppGallery = "https://appgallery.cloud.huawei.com/appdl/C27162?";
 	private const string HmsCore = "https://appgallery.cloud.huawei.com/appdl/C10132067?";
@@ -69,6 +71,7 @@ public partial class DownloadandInstallPage : ContentPage
 
         ThresholdOperation();
         adbPath = Path.Combine(_options.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
+        adbFolderPath = Path.Combine(_options.ProjectOperationPath, AdbFolder);
 
         Dispatcher.DispatchAsync(async () =>
         {
@@ -127,28 +130,40 @@ public partial class DownloadandInstallPage : ContentPage
 			this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
 		});
 		var adbServerCheck = _adbOperationService.CheckAdbServer();
-        if (!adbServerCheck)
-		{
-			await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
-			var checkDownload = File.Exists(adbPath);
-			if (checkDownload)
-			{
-				var status = AdbServer.Instance.StartServer(adbPath, true);
-				if(status == StartServerResult.Started ||status == StartServerResult.AlreadyRunning)
-				{
-					adbServerCheck = true;
-                    _adbOperationService.CreateAdbClient();
+        try
+        {
+            if (!adbServerCheck)
+            {
+                var hasAdbFolderFile = AdbFolderFileOperation();
+                if (!hasAdbFolderFile)
+                {
+                    await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
+                    hasAdbFolderFile = AdbFolderFileOperation();
                 }
-			}
-
-		}
-		else
-		{
-            _adbOperationService.CreateAdbClient();
-            AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
-            AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
-            ThresholdOperation();
+                if (hasAdbFolderFile)
+                {
+                    var status = AdbServer.Instance.StartServer(adbPath, true);
+                    if (status == StartServerResult.Started || status == StartServerResult.AlreadyRunning)
+                    {
+                        adbServerCheck = true;
+                        _adbOperationService.CreateAdbClient();
+                    }
+                }
+            }
+            else
+            {
+                _adbOperationService.CreateAdbClient();
+                AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
+                AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
+                ThresholdOperation();
+            }
         }
+        catch (Exception ex)
+        {
+            WorkingProcessAndPort.KillProcess("adb");
+            await AdbServerOperationAsync();
+        }
+
 		return adbServerCheck;
 	}
 	private async Task AlertForNotHaveAdbDevices()
@@ -170,7 +185,20 @@ public partial class DownloadandInstallPage : ContentPage
 			await Application.Current.MainPage.Navigation.PopModalAsync();
 		}
 	}
+    
+    private bool AdbFolderFileOperation()
+    {
+        var hasAdbFolder = Directory.Exists(adbFolderPath);
+        var hasAdbFile = File.Exists(adbPath);
+        var adbFolderFileCount = Directory.GetFiles(Path.Combine(adbFolderPath,"platform-tools")).Length; //must be 15
+        var adbFileSize = new FileInfo(adbPath).Length;
 
+        if (hasAdbFolder && adbFolderFileCount == 15 && hasAdbFile && adbFileSize == AdbFileSize) {
+            return true;
+        }
+        return false;
+
+    }
     #region Common
     private void ThresholdOperation()
     {

@@ -178,5 +178,14 @@ namespace HuaweiHMSInstaller.Helper
             return procName;
         }
 
+        //kill process by name
+        public static void KillProcess(string ProcessName)
+        {
+            Process[] processes = Process.GetProcessesByName(ProcessName);
+            foreach (Process process in processes)
+            {
+                process.Kill();
+            }
+        }
     }
 }
