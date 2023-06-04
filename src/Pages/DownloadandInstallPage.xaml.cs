@@ -4,6 +4,7 @@ using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
 using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Options;
+using System.Diagnostics;
 using System.Text;
 using static AdvancedSharpAdbClient.DeviceCommands.PackageManager;
 using ServiceProvider = HuaweiHMSInstaller.Services.ServiceProvider;
@@ -82,8 +83,9 @@ public partial class DownloadandInstallPage : ContentPage
 
 		//label add ... animation use behavior
 		this.dotAnimation.Behaviors.Add(new DotAnimationBehavior());
+        this.commentLabel.Text = "Device(Emulator) configuration is in progress";
 
-		var adbServerCheck = await AdbServerOperationAsync();
+        var adbServerCheck = await AdbServerOperationAsync();
 
 		if (adbServerCheck)
 		{
@@ -93,10 +95,11 @@ public partial class DownloadandInstallPage : ContentPage
 				await AlertForNotHaveAdbDevices();
 			}else{
 				await DownloadHMSApps();
-				await InstallHmsAppsAsync(adbDevices.First());
-				await FakeProgressAsync();
-				await Task.Delay(2000);
+                await InstallHmsAppsAsync(adbDevices.First());
+                await FakeProgressAsync();
+                await Task.Delay(2000);
                 await Application.Current.MainPage.Navigation.PushModalAsync(new ThanksPage(), true);
+
             }
 		}
 	}
@@ -134,11 +137,11 @@ public partial class DownloadandInstallPage : ContentPage
         {
             if (!adbServerCheck)
             {
-                var hasAdbFolderFile = AdbFolderFileOperation();
+                var hasAdbFolderFile = AdbFolderFileCheckOperation();
                 if (!hasAdbFolderFile)
                 {
                     await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
-                    hasAdbFolderFile = AdbFolderFileOperation();
+                    hasAdbFolderFile = AdbFolderFileCheckOperation();
                 }
                 if (hasAdbFolderFile)
                 {
@@ -146,13 +149,13 @@ public partial class DownloadandInstallPage : ContentPage
                     if (status == StartServerResult.Started || status == StartServerResult.AlreadyRunning)
                     {
                         adbServerCheck = true;
-                        _adbOperationService.CreateAdbClient();
+                        await _adbOperationService.CreateAdbClient();
                     }
                 }
             }
             else
             {
-                _adbOperationService.CreateAdbClient();
+                await _adbOperationService.CreateAdbClient();
                 AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
                 AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
                 ThresholdOperation();
@@ -186,15 +189,15 @@ public partial class DownloadandInstallPage : ContentPage
 		}
 	}
     
-    private bool AdbFolderFileOperation()
+    private bool AdbFolderFileCheckOperation()
     {
         var hasAdbFolder = Directory.Exists(adbFolderPath);
         var hasAdbFile = File.Exists(adbPath);
-        var adbFolderFileCount = Directory.GetFiles(Path.Combine(adbFolderPath,"platform-tools")).Length; //must be 15
-        var adbFileSize = new FileInfo(adbPath).Length;
 
-        if (hasAdbFolder && adbFolderFileCount == 15 && hasAdbFile && adbFileSize == AdbFileSize) {
-            return true;
+        if (hasAdbFolder && hasAdbFile) {
+            var adbFolderFileCount = Directory.GetFiles(Path.Combine(adbFolderPath, "platform-tools"))?.Length; //must be 15
+            var adbFileSize = new FileInfo(adbPath).Length;
+            if(adbFolderFileCount == 15 && adbFileSize == AdbFileSize) return true;
         }
         return false;
 
@@ -292,6 +295,7 @@ public partial class DownloadandInstallPage : ContentPage
     #region DownloadHMSApps
     private async Task DownloadHMSApps()
     {
+        Directory.CreateDirectory(_options.ProjectOperationPath);
         var apkUrls = new string[] { HmsCore, AppGallery, InstallGame };
         var constantMessage = new string[] { AdbMessagesConst.DownloadingHMSCore, AdbMessagesConst.DownloadingHMSAppGallery, AdbMessagesConst.DownloadingGame };
         var apkNames = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{GameItem.AppId}.apk" };
@@ -331,7 +335,6 @@ public partial class DownloadandInstallPage : ContentPage
         //Apk Paths
         var apkPaths = new string[] { $"{nameof(HmsCore)}.apk", $"{nameof(AppGallery)}.apk", $"{GameItem.AppId}.apk" };
         var queueProgress = new Queue<double>();
-
         //Progress
         for (int i = 0; i < apkPaths.Length; i++)
         {
@@ -349,14 +352,15 @@ public partial class DownloadandInstallPage : ContentPage
     }
     private async Task InstallApkToDevice(string apkPath, ProgressHandler InstallProgressChanged, DeviceData device)
     {
-		await Task.Run(() =>
-		{
+       
+        await Task.Run(() =>
+        {
             _adbOperationService.InstallApkToDevice(apkPath, InstallProgressChanged, device);
-		});
+        });
 
-    }
+     }
 
-    #endregion
+        #endregion
 
     private void ButtonCancel_Clicked(object sender, EventArgs e)
     {

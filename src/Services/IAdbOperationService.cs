@@ -14,7 +14,7 @@ namespace HuaweiHMSInstaller.Services
         public Task DownloadAdbFromInternetAsync(IProgress<float> progress = null);
         public Task<List<DeviceData>> GetDevices();
         public Task DownloadApkFromInternetAsync(string apkUrl, string apkName, IProgress<float> progress = null);
-        public void InstallApkToDevice(string packageFilePath, ProgressHandler InstallProgressChanged, DeviceData device);
-        public void CreateAdbClient();
+        public void InstallApkToDevice(string packageFilePath, ProgressHandler installProgressChanged, DeviceData device);
+        public Task CreateAdbClient();
     }
 }

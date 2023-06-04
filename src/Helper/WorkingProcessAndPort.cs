@@ -60,10 +60,9 @@ namespace HuaweiHMSInstaller.Helper
             return process;
         }
 
-        public static int? GetProcessPortNumber(int ProcessId)
+        public static async Task<int?> GetProcessPortNumberAsync(int ProcessId)
         {
-
-            var allProcessPorts = GetNetStatPorts();
+            var allProcessPorts = await Task.Run(() => GetNetStatPorts());
 
             var processPort = allProcessPorts.FirstOrDefault(t=> t.ProcessId == ProcessId);
 
@@ -186,6 +185,14 @@ namespace HuaweiHMSInstaller.Helper
             {
                 process.Kill();
             }
+        }
+
+        public static Process StartProcess(string FilePath)
+        {
+            Process process = new Process();
+            process.StartInfo.FileName = FilePath;
+            process.Start();
+            return process;
         }
     }
 }
