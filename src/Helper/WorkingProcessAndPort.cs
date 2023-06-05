@@ -129,8 +129,8 @@ namespace HuaweiHMSInstaller.Helper
                             try
                             {
                                 ProcessPorts.Add(new ProcessPort(
-                                    Tokens[1] == "UDP" ? GetProcessName(Convert.ToInt16(Tokens[4])) : GetProcessName(Convert.ToInt16(Tokens[5])),
-                                    Tokens[1] == "UDP" ? Convert.ToInt16(Tokens[4]) : Convert.ToInt16(Tokens[5]),
+                                    Tokens[1] == "UDP" ? GetProcessName(Convert.ToUInt16(Tokens[4])) : GetProcessName(Convert.ToUInt16(Tokens[5])),
+                                    Tokens[1] == "UDP" ? Convert.ToUInt16(Tokens[4]) : Convert.ToUInt16(Tokens[5]),
                                     IpAddress.Contains("1.1.1.1") ? String.Format("{0}v6", Tokens[1]) : String.Format("{0}v4", Tokens[1]),
                                     Convert.ToInt32(IpAddress.Split(':')[1])
                                 ));

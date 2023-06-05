@@ -132,6 +132,13 @@ public partial class DownloadandInstallPage : ContentPage
 			hmsInfoBuilder.Append(hmsInfoMessage[indexHmsInfo]);
 			this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
 		});
+
+        void DisableAdbProgressMessages()
+        {
+            AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
+            AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
+            ThresholdOperation();
+        }
 		var adbServerCheck = _adbOperationService.CheckAdbServer();
         try
         {
@@ -148,6 +155,7 @@ public partial class DownloadandInstallPage : ContentPage
                     var status = AdbServer.Instance.StartServer(adbPath, true);
                     if (status == StartServerResult.Started || status == StartServerResult.AlreadyRunning)
                     {
+                        DisableAdbProgressMessages();
                         adbServerCheck = true;
                         await _adbOperationService.CreateAdbClient();
                     }
@@ -155,9 +163,7 @@ public partial class DownloadandInstallPage : ContentPage
             }
             else
             {
-                await _adbOperationService.CreateAdbClient();
-                AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
-                AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
+                DisableAdbProgressMessages();
                 ThresholdOperation();
             }
         }
