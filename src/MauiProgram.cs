@@ -65,6 +65,7 @@ public static class MauiProgram
 #endif
         var services = builder.Services;
         builder.Services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(),"HuaweiHMSInstaller")); //configure value
+        builder.Services.Configure<GlobalOptions>(x => x.VersionNumber = "0.0.1"); //configure value
 
         services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
