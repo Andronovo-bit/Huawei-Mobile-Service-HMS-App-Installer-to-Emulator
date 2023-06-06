@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Maui;
 using System.Web;
 
 namespace HuaweiHMSInstaller.Integrations
@@ -6,6 +7,7 @@ namespace HuaweiHMSInstaller.Integrations
     public class AppGalleryIntegration: IAppGalleryIntegration
     {
         // Define the parameters for the function call
+        private const string BaseUrl = "https://web-dre.hispace.dbankcloud.cn/uowap/index";
 
 
         private readonly MemoryCache cache = new(new MemoryCacheOptions());
@@ -26,7 +28,7 @@ namespace HuaweiHMSInstaller.Integrations
             var _httpClient = _httpClientFactory.CreateClient();
 
             // Use UriBuilder and HttpUtility to construct the URL and query string
-            var urlBuilder = new UriBuilder("https://web-dre.hispace.dbankcloud.cn/uowap/index");
+            var urlBuilder = new UriBuilder(BaseUrl);
             var queryParameters = HttpUtility.ParseQueryString(string.Empty);
             queryParameters["method"] = method;
             queryParameters["serviceType"] = serviceType;
@@ -83,7 +85,7 @@ namespace HuaweiHMSInstaller.Integrations
             var _httpClient = _httpClientFactory.CreateClient();
 
             // Define the base URL and query parameters as constants
-            const string url = "https://web-dre.hispace.dbankcloud.cn/uowap/index";
+            const string url = BaseUrl;
             const string method = "internal.getTabDetail";
             const string serviceType = "20";
             const string reqPageNum = "1";
@@ -138,6 +140,62 @@ namespace HuaweiHMSInstaller.Integrations
                     return content;
                 }
             }
+        }
+    
+        public async Task<string> GetDetailAppInAppGalleryAsync(string appId, string locale)
+        {
+            // Use HttpClientFactory to create an HttpClient instance
+            using var _httpClient = _httpClientFactory.CreateClient();
+            // Create a UriBuilder with the base URL
+            var uriBuilder = new UriBuilder(BaseUrl);
+
+            // Create a NameValueCollection with the query parameters
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["method"] = "internal.getTabDetail";
+            query["serviceType"] = "20";
+            query["reqPageNum"] = "1";
+            query["maxResults"] = "25";
+            query["uri"] = $"app|{appId}";
+            query["accessId"] = "";
+            query["appid"] = appId;
+            query["zone"] = locale;
+            query["locale"] = locale;
+
+            // Assign the query string to the UriBuilder
+            uriBuilder.Query = query.ToString();
+
+            // Generate a cache key from the keyword and locale
+            var cacheKey = $"{appId}_{locale}";
+
+            // Check if the cache contains the key
+            if (cache.TryGetValue(cacheKey, out string cachedContent))
+            {
+                // Return the cached content
+                return cachedContent;
+            }
+            else
+            {
+                // Use async and await with using to dispose of the HttpResponseMessage object
+                using (var response = await _httpClient.GetAsync(uriBuilder.Uri))
+                {
+                    // Throw an exception if the status code is not successful
+                    response.EnsureSuccessStatusCode();
+
+                    // Read and return the response content as a string
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    // Set the cache options with a one day expiration time
+                    var cacheOptions = new MemoryCacheEntryOptions()
+                        .SetAbsoluteExpiration(TimeSpan.FromDays(1));
+
+                    // Store the content in the cache with the key and options
+                    cache.Set(cacheKey, content, cacheOptions);
+
+                    // Return the content
+                    return content;
+                }
+            }
+
         }
     }
 }

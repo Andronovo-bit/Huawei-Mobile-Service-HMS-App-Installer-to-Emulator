@@ -1,11 +1,6 @@
 ﻿using HuaweiHMSInstaller.Integrations;
 using HuaweiHMSInstaller.Models.MappingModels;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HmsInstallerTest
 {
@@ -62,6 +57,31 @@ namespace HmsInstallerTest
             Assert.Contains(locale, content);
             Assert.True(mappingResult?.count > 0);
             var hasGameName = mappingResult.layoutData.Any(t => t.dataList.Any(k => k.name == keyword));
+            Assert.True(hasGameName);
+        }
+
+        // Define a method to test the GetDetailAppInAppGalleryAsync method
+        [Fact]
+        public async Task GetDetailAppInAppGalleryAsync_ShouldReturnSuccess()
+        {
+            // Arrange
+            // Create an instance of the class that contains the method to test
+            var appGallery = new AppGalleryIntegration(_client);
+
+            // Define the input parameters for the method
+            var appId = "C102059395";
+            var locale = "tr";
+
+            // Act
+            // Call the method and get the content
+            var content = await appGallery.GetDetailAppInAppGalleryAsync(appId, locale);
+            var mappingResult = JsonConvert.DeserializeObject<AppGalleryAppDetailResult>(content);
+
+            // Assert
+
+            // Verify that the result content is not null or empty
+            Assert.NotNull(content);
+            var hasGameName = mappingResult.layoutData.Any(t => t.dataList.Any(k => k.appid == appId));
             Assert.True(hasGameName);
         }
 
