@@ -2,7 +2,6 @@
 
 namespace HuaweiHMSInstaller.Models.MappingModels
 {
-    // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
     public class Authority
     {
         public List<object> list { get; set; }
