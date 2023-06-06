@@ -103,58 +103,76 @@ public partial class DownloadandInstallPage : ContentPage
             }
 		}
 	}
-	private async Task<bool> AdbServerOperationAsync()
-	{
-		IProgress<float> progressAdb = new Progress<float>(value =>
-		{
-			var realValue = (value / thresholds.Length)*2;
-			// If the progress exceeds the current threshold, increment the message index
+    // Define a method to update the progress bar and the labels based on the value
+    private void UpdateProgress(float value)
+    {
+        // Calculate the real value based on the thresholds length and a factor of 2
+        var realValue = (value / thresholds.Length) * 2;
 
-			// Update the progress bar value
-			// Get the index of the message that corresponds to the current progress value
-			globalProgress = realValue;
-			this.progressBar.Progress = realValue;
-			if (globalProgress >= thresholds[index] / 100f)
-			{
-				index++;
-			}
-			if (globalProgress >= thresholdsHmsInfo[indexHmsInfo] / 100f)
-			{
-				indexHmsInfo++;
-			}
-			// Update the message
-			// Update the comment label text based on the current progress and message index
-			commentBuilder.Clear();
-			commentBuilder.Append(AdbProgressMessages.ElementAt(index).Key);
-			this.commentLabel.Text = commentBuilder.ToString();
+        // Update the global progress and the progress bar value
+        globalProgress = realValue;
+        this.progressBar.Progress = realValue;
 
-			hmsInfoBuilder.Clear();
-			hmsInfoBuilder.Append(hmsInfoMessage[indexHmsInfo]);
-			this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
-		});
-
-        void DisableAdbProgressMessages()
+        // If the progress exceeds the current threshold, increment the message index
+        if (globalProgress >= thresholds[index] / 100f)
         {
-            AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
-            AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
-            ThresholdOperation();
+            index++;
         }
-		var adbServerCheck = _adbOperationService.CheckAdbServer();
+        if (globalProgress >= thresholdsHmsInfo[indexHmsInfo] / 100f)
+        {
+            indexHmsInfo++;
+        }
+
+        // Update the comment label text based on the current message index
+        commentBuilder.Clear();
+        commentBuilder.Append(AdbProgressMessages.ElementAt(index).Key);
+        this.commentLabel.Text = commentBuilder.ToString();
+
+        // Update the HMS info label text based on the current message index
+        hmsInfoBuilder.Clear();
+        hmsInfoBuilder.Append(hmsInfoMessage[indexHmsInfo]);
+        this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
+    }
+
+    // Define a method to disable the adb progress messages and update the thresholds
+    private void DisableAdbProgressMessages()
+    {
+        AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
+        AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
+        ThresholdOperation();
+    }
+
+    // Define a method to perform the adb server operation asynchronously
+    private async Task<bool> AdbServerOperationAsync()
+    {
+        // Create a progress object that invokes the UpdateProgress method
+        IProgress<float> progressAdb = new Progress<float>(UpdateProgress);
+
+        // Check if the adb server is running
+        var adbServerCheck = _adbOperationService.CheckAdbServer();
+
         try
         {
             if (!adbServerCheck)
             {
+                // Check if the adb folder file exists
                 var hasAdbFolderFile = AdbFolderFileCheckOperation();
+
                 if (!hasAdbFolderFile)
                 {
+                    // Download the adb from internet and check again
                     await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
                     hasAdbFolderFile = AdbFolderFileCheckOperation();
                 }
+
                 if (hasAdbFolderFile)
                 {
+                    // Start the adb server and check the status
                     var status = AdbServer.Instance.StartServer(adbPath, true);
+
                     if (status == StartServerResult.Started || status == StartServerResult.AlreadyRunning)
                     {
+                        // Disable the adb progress messages and create an adb client
                         DisableAdbProgressMessages();
                         adbServerCheck = true;
                         await _adbOperationService.CreateAdbClient();
@@ -163,19 +181,23 @@ public partial class DownloadandInstallPage : ContentPage
             }
             else
             {
+                // Disable the adb progress messages, update the thresholds and create an adb client
                 DisableAdbProgressMessages();
                 ThresholdOperation();
+                await _adbOperationService.CreateAdbClient();
             }
         }
         catch (Exception ex)
         {
+            // Kill the adb process and retry the operation
             WorkingProcessAndPort.KillProcess("adb");
             await AdbServerOperationAsync();
         }
 
-		return adbServerCheck;
-	}
-	private async Task AlertForNotHaveAdbDevices()
+        return adbServerCheck;
+    }
+
+    private async Task AlertForNotHaveAdbDevices()
 	{
 		await Task.Delay(1000);
         var errorLanguage = _localizationResourceManager.GetValue("error");
