@@ -17,6 +17,7 @@
     <Color x:Key="Gray600">#404040</Color>
     <Color x:Key="Gray900">#212121</Color>
     <Color x:Key="Gray950">#141414</Color>
+    <Color x:Key="SemiTransparentBlack">#80000000</Color>
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource Secondary}"/>
     <SolidColorBrush x:Key="TertiaryBrush" Color="{StaticResource Tertiary}"/>
@@ -30,6 +31,16 @@
     <SolidColorBrush x:Key="Gray600Brush" Color="{StaticResource Gray600}"/>
     <SolidColorBrush x:Key="Gray900Brush" Color="{StaticResource Gray900}"/>
     <SolidColorBrush x:Key="Gray950Brush" Color="{StaticResource Gray950}"/>
+    <LinearGradientBrush x:Key="RedTransparentGradient" StartPoint="0,0" EndPoint="1,0">
+        <GradientStop Color="Red" Offset="0.0" />
+        <GradientStop Color="Transparent" Offset="1.0" />
+    </LinearGradientBrush>
+    <!-- Define a radial gradient brush with a key -->
+    <RadialGradientBrush x:Key="RedTransparentGradientRadial" Center="0.3,0.5" Radius="0.7">
+        <GradientStop Color="#9b0107" Offset="0.1" />
+        <GradientStop Color="Transparent" Offset="1.0" />
+    </RadialGradientBrush>
+
 
     <Color x:Key="Yellow100Accent">#F7B548</Color>
     <Color x:Key="Yellow200Accent">#FFD590</Color>
