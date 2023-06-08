@@ -228,4 +228,22 @@
   <data name="bye_bye" xml:space="preserve">
     <value>Bye Bye</value>
   </data>
+  <data name="searching" xml:space="preserve">
+    <value>Searching...</value>
+  </data>
+  <data name="version" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="no_search_result_found" xml:space="preserve">
+    <value>No search results found</value>
+  </data>
+  <data name="size" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="change_game" xml:space="preserve">
+    <value>Change Game</value>
+  </data>
+  <data name="please_wait" xml:space="preserve">
+    <value>Please Wait...</value>
+  </data>
 </root>

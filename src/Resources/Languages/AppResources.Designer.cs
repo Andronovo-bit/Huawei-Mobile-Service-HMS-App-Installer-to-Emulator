@@ -88,6 +88,15 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Change Game.
+        /// </summary>
+        internal static string change_game {
+            get {
+                return ResourceManager.GetString("change_game", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Check Internet.
         /// </summary>
         internal static string check_internet {
@@ -313,11 +322,29 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No search results found.
+        /// </summary>
+        internal static string no_search_result_found {
+            get {
+                return ResourceManager.GetString("no_search_result_found", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please input search keyword.
         /// </summary>
         internal static string please_input_seach_keyword {
             get {
                 return ResourceManager.GetString("please_input_seach_keyword", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please Wait....
+        /// </summary>
+        internal static string please_wait {
+            get {
+                return ResourceManager.GetString("please_wait", resourceCulture);
             }
         }
         
@@ -336,6 +363,24 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         internal static string search_games {
             get {
                 return ResourceManager.GetString("search_games", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Searching....
+        /// </summary>
+        internal static string searching {
+            get {
+                return ResourceManager.GetString("searching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Size.
+        /// </summary>
+        internal static string size {
+            get {
+                return ResourceManager.GetString("size", resourceCulture);
             }
         }
         
@@ -372,6 +417,15 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         internal static string thanks_for_installing {
             get {
                 return ResourceManager.GetString("thanks_for_installing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version.
+        /// </summary>
+        internal static string version {
+            get {
+                return ResourceManager.GetString("version", resourceCulture);
             }
         }
         

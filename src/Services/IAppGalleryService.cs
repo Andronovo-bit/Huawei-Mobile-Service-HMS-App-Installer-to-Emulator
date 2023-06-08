@@ -1,14 +1,10 @@
 ﻿using HuaweiHMSInstaller.Models.MappingModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HuaweiHMSInstaller.Services
 {
     internal interface IAppGalleryService
     {
         Task<AppGalleryAdvancedSearchResult> SearchAppGalleryApp(string keyword);
+        Task<AppGalleryAppDetailResult> GetAppDetail(string appId);
     }
 }

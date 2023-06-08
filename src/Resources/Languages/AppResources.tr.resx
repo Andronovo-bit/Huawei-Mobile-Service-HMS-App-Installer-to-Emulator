@@ -228,4 +228,22 @@
   <data name="bye_bye" xml:space="preserve">
     <value>Hoşça kalın</value>
   </data>
+  <data name="searching" xml:space="preserve">
+    <value>Aranıyor...</value>
+  </data>
+  <data name="version" xml:space="preserve">
+    <value>Sürüm</value>
+  </data>
+  <data name="no_search_result_found" xml:space="preserve">
+    <value>Arama sonucu bulunamadı</value>
+  </data>
+  <data name="size" xml:space="preserve">
+    <value>Boyut</value>
+  </data>
+  <data name="change_game" xml:space="preserve">
+    <value>Oyunu Değiştir</value>
+  </data>
+  <data name="please_wait" xml:space="preserve">
+    <value>Lütfen bekleyin...</value>
+  </data>
 </root>
