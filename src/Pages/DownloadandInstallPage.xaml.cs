@@ -83,7 +83,7 @@ public partial class DownloadandInstallPage : ContentPage
 
 		//label add ... animation use behavior
 		this.dotAnimation.Behaviors.Add(new DotAnimationBehavior());
-        this.commentLabel.Text = "Device(Emulator) configuration is in progress";
+        this.commentLabel.Text = _localizationResourceManager.GetValue("emulator_config_progress");
 
         var adbServerCheck = await AdbServerOperationAsync();
 
