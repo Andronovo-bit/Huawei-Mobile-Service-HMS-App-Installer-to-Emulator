@@ -13,4 +13,12 @@ public partial class App : Application
         Routing.RegisterRoute(nameof(ThanksPage), typeof(ThanksPage));
 
     }
+    protected override Window CreateWindow(IActivationState activationState)
+    {
+        var window = base.CreateWindow(activationState);
+        window.MinimumWidth = 600;
+        window.MinimumHeight = 600;
+        return window;
+    }
+
 }

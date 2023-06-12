@@ -13,6 +13,7 @@ public static class MauiProgram
 {      
     public static MauiApp CreateMauiApp()
 	{
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MjMzMDMzMUAzMjMxMmUzMDJlMzBlVmRiNTFydWVxTWlsMlE5aHc2WThWYWl2NG9kREdxZFJKWjFoWkNUYng0PQ==");
         var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
@@ -37,27 +38,27 @@ public static class MauiProgram
         Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping(nameof(IWindow), (handler, view) =>
         {
 
-#if WINDOWS
-                var size = new Windows.Graphics.SizeInt32();
-                size.Height = 720;
-                size.Width  = 1150;
-                var mauiWindow = handler.VirtualView;
-                var nativeWindow = handler.PlatformView;
-                var corew = nativeWindow.CoreWindow;
-                nativeWindow.Activate();
-                IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(nativeWindow);
-                var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(windowHandle);
-                var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
-                var newPositionX = (int)(((appWindow.Size.Width * appWindow.Position.X ) / size.Width) +  (appWindow.Position.X));
-                var newPositionY = (int)((appWindow.Size.Height * appWindow.Position.Y ) / size.Height);
-                appWindow.Resize(size);
-                // find center of screen
-                var appWindowPosition =  appWindow.Position;                
-                appWindowPosition.X = newPositionX;
-                appWindowPosition.Y = newPositionY;
-                appWindow.Move(appWindowPosition);
+//#if WINDOWS
+//                var size = new Windows.Graphics.SizeInt32();
+//                size.Height = 720;
+//                size.Width  = 1150;
+//                var mauiWindow = handler.VirtualView;
+//                var nativeWindow = handler.PlatformView;
+//                var corew = nativeWindow.CoreWindow;
+//                nativeWindow.Activate();
+//                IntPtr windowHandle = WinRT.Interop.WindowNative.GetWindowHandle(nativeWindow);
+//                var windowId = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(windowHandle);
+//                var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(windowId);
+//                var newPositionX = (int)(((appWindow.Size.Width * appWindow.Position.X ) / size.Width) +  (appWindow.Position.X));
+//                var newPositionY = (int)((appWindow.Size.Height * appWindow.Position.Y ) / size.Height);
+//                appWindow.Resize(size);
+//                // find center of screen
+//                var appWindowPosition =  appWindow.Position;                
+//                appWindowPosition.X = newPositionX;
+//                appWindowPosition.Y = newPositionY;
+//                appWindow.Move(appWindowPosition);
                 
-#endif
+//#endif
 
         });
 #if DEBUG
