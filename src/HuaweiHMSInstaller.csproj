@@ -61,6 +61,8 @@
 	  <None Remove="Resources\Fonts\FA-Free-Solid-900.otf" />
 	  <None Remove="Resources\Images\huawei_background.png" />
 	  <None Remove="Resources\Images\huawei_background2.jpg" />
+	  <None Remove="Resources\Images\no_connection.png" />
+	  <None Remove="Resources\Images\wifi.png" />
 
 	</ItemGroup>
 

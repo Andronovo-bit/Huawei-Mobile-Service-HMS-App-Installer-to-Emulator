@@ -160,6 +160,15 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Device(Emulator) configuration is in progress.
+        /// </summary>
+        internal static string emulator_config_progress {
+            get {
+                return ResourceManager.GetString("emulator_config_progress", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Please connect your device or emulator and try again.
         /// </summary>
         internal static string emulator_try_again_connect {
@@ -250,11 +259,29 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This app is a tool that allows you to install and run Android game on the emulator along with Huawei Mobile Services (HMS) apps. The game run depending on Appgallery..
+        /// </summary>
+        internal static string huawei_emulator_description {
+            get {
+                return ResourceManager.GetString("huawei_emulator_description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Huawei Emulator Installer.
         /// </summary>
         internal static string huawei_emulator_installer {
             get {
                 return ResourceManager.GetString("huawei_emulator_installer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Huawei server unreachable at the moment, please try again later..
+        /// </summary>
+        internal static string huawei_server_unreachable {
+            get {
+                return ResourceManager.GetString("huawei_server_unreachable", resourceCulture);
             }
         }
         
@@ -300,6 +327,15 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         internal static string installing_hms_core {
             get {
                 return ResourceManager.GetString("installing_hms_core", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Something is wrong with your internet connection, please fix it and try again..
+        /// </summary>
+        internal static string internet_connection_error {
+            get {
+                return ResourceManager.GetString("internet_connection_error", resourceCulture);
             }
         }
         

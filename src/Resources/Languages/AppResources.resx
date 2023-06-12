@@ -246,4 +246,16 @@
   <data name="please_wait" xml:space="preserve">
     <value>Please Wait...</value>
   </data>
+  <data name="huawei_emulator_description" xml:space="preserve">
+    <value>This app is a tool that allows you to install and run Android game on the emulator along with Huawei Mobile Services (HMS) apps. The game run depending on Appgallery.</value>
+  </data>
+  <data name="emulator_config_progress" xml:space="preserve">
+    <value>Device(Emulator) configuration is in progress</value>
+  </data>
+  <data name="internet_connection_error" xml:space="preserve">
+    <value>Something is wrong with your internet connection, please fix it and try again.</value>
+  </data>
+  <data name="huawei_server_unreachable" xml:space="preserve">
+    <value>Huawei server unreachable at the moment, please try again later.</value>
+  </data>
 </root>

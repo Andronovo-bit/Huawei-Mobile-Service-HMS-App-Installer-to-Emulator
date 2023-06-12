@@ -246,4 +246,16 @@
   <data name="please_wait" xml:space="preserve">
     <value>Por favor, espere...</value>
   </data>
+  <data name="huawei_emulator_description" xml:space="preserve">
+    <value>Esta aplicación es una herramienta que te permite instalar y ejecutar juegos Android en el emulador junto con aplicaciones de Huawei Mobile Services (HMS). El juego se ejecuta en función de Appgallery.</value>
+  </data>
+  <data name="emulator_config_progress" xml:space="preserve">
+    <value>La configuración del dispositivo (emulador) está en curso</value>
+  </data>
+  <data name="internet_connection_error" xml:space="preserve">
+    <value>Algo va mal con tu conexión a Internet, por favor, arréglalo e inténtalo de nuevo.</value>
+  </data>
+  <data name="huawei_server_unreachable" xml:space="preserve">
+    <value>Servidor Huawei inaccesible en este momento, por favor inténtelo más tarde.</value>
+  </data>
 </root>
