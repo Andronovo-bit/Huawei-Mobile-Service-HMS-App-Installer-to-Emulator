@@ -6,5 +6,6 @@ namespace HuaweiHMSInstaller.Services
     {
         Task<AppGalleryAdvancedSearchResult> SearchAppGalleryApp(string keyword);
         Task<AppGalleryAppDetailResult> GetAppDetail(string appId);
+        Task<bool> CheckAppGalleryServiceAsync();
     }
 }

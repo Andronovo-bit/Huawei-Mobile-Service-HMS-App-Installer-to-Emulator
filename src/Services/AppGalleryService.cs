@@ -32,5 +32,7 @@ namespace HuaweiHMSInstaller.Services
             var mappingResult = JsonConvert.DeserializeObject<AppGalleryAppDetailResult>(result);
             return mappingResult;
         }
+
+        public async Task<bool> CheckAppGalleryServiceAsync() => await _appGalleryIntegration.CheckBaseUrlAsync();
     }
 }

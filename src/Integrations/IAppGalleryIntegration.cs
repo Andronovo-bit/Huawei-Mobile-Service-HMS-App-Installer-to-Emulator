@@ -11,5 +11,6 @@ namespace HuaweiHMSInstaller.Integrations
         Task<string> SearchAppInAppGalleryAsync(string keyword, string locale);
         Task<string> AdvancedSearchAppInAppGalleryAsync(string keyword, string locale);
         Task<string> GetDetailAppInAppGalleryAsync(string appId, string locale);
+        Task<bool> CheckBaseUrlAsync();
     }
 }

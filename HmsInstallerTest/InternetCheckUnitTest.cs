@@ -9,7 +9,7 @@ namespace HmsInstallerTest
         public async Task CheckForInternetConnectionAsync_ReturnsTrue_WhenInternetIsAvailable()
         {
             // Act
-            var result = await CheckInternetConnection.CheckForInternetConnectionAsync();
+            var result = await NetworkUtils.CheckForInternetConnectionAsync();
 
             // Assert
             Assert.True(result);

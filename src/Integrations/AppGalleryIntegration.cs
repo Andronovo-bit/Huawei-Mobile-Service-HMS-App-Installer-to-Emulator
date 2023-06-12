@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using HuaweiHMSInstaller.Helper;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Maui;
 using System.Web;
 
@@ -197,5 +198,7 @@ namespace HuaweiHMSInstaller.Integrations
             }
 
         }
+    
+        public async Task<bool> CheckBaseUrlAsync() => await NetworkUtils.IsLinkAvailableAsync($"{BaseUrl}?method=internal.getTabDetail&serviceType=20");
     }
 }
