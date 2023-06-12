@@ -37,7 +37,6 @@ public partial class MainPage : ContentPage
         InitializeComponent();
         Init();
     }
-
     private void Init()
     {
         this.langPicker.SelectedItem = _localizationResourceManager.CurrentCulture.TwoLetterISOLanguageName.ToUpper();
@@ -46,9 +45,7 @@ public partial class MainPage : ContentPage
         this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
 
         CheckInternetAndAppGalleryService(AfterEventCheckInternetAndHuaweiServiceInit);
-
     }
-
     #region Internet&Huawei server check operation
     private bool CheckInternetConnectionInit()
     {
@@ -58,15 +55,15 @@ public partial class MainPage : ContentPage
 
         return false;
     }
-    private void CheckHuaweiService(Worker<bool>.WorkCompletedEventHandler func)
+    private void CheckHuaweiService(Worker<bool>.WorkCompletedEventHandler func) =>
+        CheckService(func, _appGalleryService.CheckAppGalleryServiceAsync);
+    private void CheckHuaweiCloudService(Worker<bool>.WorkCompletedEventHandler func) =>
+        CheckService(func, _appGalleryService.CheckAppGalleryCloudServiceAsync);
+    private void CheckService(Worker<bool>.WorkCompletedEventHandler func, Func<Task<bool>> check)
     {
-
         var worker = new Worker<bool>();
-
         worker.WorkCompleted += func;
-
-        _ = worker.DoWorkAsync(async () => await _appGalleryService.CheckAppGalleryServiceAsync());
-
+        _ = worker.DoWorkAsync(async () => await check());
     }
     private void CheckInternetAndAppGalleryService(Worker<bool>.WorkCompletedEventHandler func)
     {
@@ -185,7 +182,6 @@ public partial class MainPage : ContentPage
     }
     private async Task CreateCheckingInternetConnectionPopup()
     {
-        
         //Initialize the popup
         var popup = new SfPopup();
         var grid = new Grid();
@@ -199,11 +195,7 @@ public partial class MainPage : ContentPage
         CreateCircle(out Ellipse circle);
 
         // Create an animation that scales the circle and rotates the check mark
-        var animationMark = new Animation
-        {
-            { 0, 0.5, new (v => checkMark.Scale = v, 1, 1.2) },
-            { 0.5, 1, new (v => checkMark.Scale = v, 1.2, 1) },
-        };
+        var animationMark = CreateAnimationMark(checkMark);
 
         // Use a stack layout to arrange multiple objects
         var stackLayout = new StackLayout
@@ -221,22 +213,11 @@ public partial class MainPage : ContentPage
         stackLayout.Children.Add(image);
 
         //Create a label for the popup content
-        var label = new Label
-        {
-            Text = _localizationResourceManager.GetValue("check_internet_connection"),
-            TextColor = Color.FromArgb("#000000"),
-            FontSize = 20,
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-        };
-        //label add ... animation
-        var dotAnimationBehavior = new DotAnimationBehavior();
-        label.Behaviors.Add(dotAnimationBehavior);
+        var label = CreateLabel(_localizationResourceManager.GetValue("check_internet_connection"));
 
         stackLayout.Children.Add(label);
 
-        var animationCircle = new Animation(v => circle.Rotation = v, 0, 360);
-        animationCircle.Commit(circle, "CircleAnimation", 16, 1000, Easing.Linear, null, () => true);
+        var animationCircle = CreateAnimationCircle(circle);
         stackLayout.Children.Add(circle);
 
         stackLayout.Children.Add(grid);
@@ -244,44 +225,56 @@ public partial class MainPage : ContentPage
         //get popup size
 
         var resultCheckingInternetConnection = await NetworkUtils.CheckForInternetConnectionAsync();
-        
-        Dispatcher.StartTimer(TimeSpan.FromSeconds(4), () =>
+
+        void NotInternetAndHuweiServiceState(string langKey)
         {
-            animationMark.Commit(this, "ConfirmationAnimation", length: 1000);
-            //dotAnimationBehavior.BindingContext = null;
-            if (resultCheckingInternetConnection)
-            {
+            label.FontSize = 19;
+            label.Margin = new Thickness(0, 0, 0, 10);
+            label.Text = _localizationResourceManager.GetValue(langKey);
+            stackLayout.Children.Remove(circle);
+            grid.Children.Add(wrongMark);
+            // Add a button as the third object
+            popup.ShowFooter = true;
+            footerButton.Clicked += OnButtonClicked;
+        }
 
-                label.Text = _localizationResourceManager.GetValue("internet_connection_ok");
-                stackLayout.Children.Remove(circle);
-                grid.Children.Add(checkMark);
-                Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
+        void CheckHuaweiCloudServicekCallBack(object sender, bool result)
+        {
+            Dispatcher.StartTimer(TimeSpan.FromSeconds(3), () =>
+            {
+                if (result)
                 {
-                    if (!popup.IsOpen) return false;
-                    popup.IsOpen = false;
-                    popup.Dismiss();
-                    stackLayout.Children.Remove(popup);
-                    Application.Current.MainPage.Navigation.PushModalAsync(new DownloadandInstallPage(SelectedItem), true);
-                    return false;
-                });
+                    animationMark.Commit(this, "ConfirmationAnimation", length: 1000);
+                    label.Text = _localizationResourceManager.GetValue("internet_connection_ok");
+                    stackLayout.Children.Remove(circle);
+                    grid.Children.Add(checkMark);
+                    Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
+                    {
+                        if (!popup.IsOpen) return false;
+                        popup.IsOpen = false;
+                        popup.Dismiss();
+                        stackLayout.Children.Remove(popup);
+                        Application.Current.MainPage.Navigation.PushModalAsync(new DownloadandInstallPage(SelectedItem), true);
+                        return false;
+                    });
+                }
+                else
+                {
+                    NotInternetAndHuweiServiceState("huawei_server_unreachable");
+                }
                 return false;
-            }
-            else
-            {
-                label.FontSize = 19;
-                label.Margin = new Thickness(0,0, 0, 10);
-                label.Text = _localizationResourceManager.GetValue("internet_connection_not_ok");
-                stackLayout.Children.Remove(circle);
-                grid.Children.Add(wrongMark);
-                // Add a button as the third object
-                popup.ShowFooter = true;
-                footerButton.Clicked += OnButtonClicked;
+            });
 
-                return false;
+        }
 
-            }
-
-        });
+        if (resultCheckingInternetConnection)
+        {
+            CheckHuaweiCloudService(CheckHuaweiCloudServicekCallBack);
+        }
+        else
+        {
+            NotInternetAndHuweiServiceState("internet_connection_not_ok");
+        }
 
         //Set the label as the popup content
         this.MainContentViewArea.Children.Add(popup);
@@ -290,8 +283,41 @@ public partial class MainPage : ContentPage
         {
             return stackLayout;
         });
+
         popup.Show();
-        
+
+    }
+    // Create an animation that scales the circle and rotates the check mark
+    private Animation CreateAnimationMark(Path checkMark)
+    {
+        var animationMark = new Animation
+        {
+            { 0, 0.5, new (v => checkMark.Scale = v, 1, 1.2) },
+            { 0.5, 1, new (v => checkMark.Scale = v, 1.2, 1) },
+        };
+        return animationMark;
+    }
+    //Create a label for the popup content
+    private Label CreateLabel(string text)
+    {
+        var label = new Label
+        {
+            Text = text,
+            TextColor = Color.FromArgb("#000000"),
+            FontSize = 20,
+            HorizontalOptions = LayoutOptions.Center,
+            VerticalOptions = LayoutOptions.Center,
+        };
+        //label add ... animation
+        var dotAnimationBehavior = new DotAnimationBehavior();
+        label.Behaviors.Add(dotAnimationBehavior);
+        return label;
+    }
+    private Animation CreateAnimationCircle(Ellipse circle)
+    {
+        var animationCircle = new Animation(v => circle.Rotation = v, 0, 360);
+        animationCircle.Commit(circle, "CircleAnimation", 16, 1000, Easing.Linear, null, () => true);
+        return animationCircle;
     }
     private void CreateCircle(out Ellipse circle)
     {
@@ -597,12 +623,10 @@ public partial class MainPage : ContentPage
         this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
 
         this.sponsorGameStackLayout.IsVisible = false ;
+        this.sponsorGameNotInternetorHuaweiService.IsVisible = false;
         this.sponsorGameLoader.IsVisible = true ;
-        Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
-        {
-            _ = GetSponsorGameInfo();
-            return false;
-        });
+
+        Init();
 
     }
     private void Button_ChangeGame_Clicked(object sender, EventArgs e)

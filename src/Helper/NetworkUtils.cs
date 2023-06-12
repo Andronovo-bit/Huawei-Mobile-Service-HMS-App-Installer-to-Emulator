@@ -1,9 +1,4 @@
-﻿using SpeedTest.Net;
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Net.NetworkInformation;
+﻿using System.Net;
 
 namespace HuaweiHMSInstaller.Helper
 {
