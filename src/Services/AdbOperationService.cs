@@ -109,7 +109,7 @@ namespace HuaweiHMSInstaller.Services
             }
             return devices;
         }
-        public async Task DownloadApkFromInternetAsync(string apkUrl, string apkName, IProgress<float> progress = null)
+        public async Task DownloadApkFromInternetAsync(string apkUrl, string apkName, IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -120,7 +120,7 @@ namespace HuaweiHMSInstaller.Services
                     try
                     {
                         // Download the file using the custom extension method
-                        await _httpClient.DownloadAsync(apkUrl, file, progress);
+                        await _httpClient.DownloadAsync(apkUrl, file, progress, cancellationToken);
 
                         // Check the network availability flag before completing the download
                         if (!_isNetworkAvailable)
@@ -130,12 +130,19 @@ namespace HuaweiHMSInstaller.Services
                             return;
                         }
                     }
+                    catch (TaskCanceledException ex) // The request was canceled due to the timeout or the token
+                    {
+                        // Check if the cancellation was requested by the token
+                        await file.DisposeAsync();
+                        throw ex;
+                    }
                     catch (Exception ex)
                     {
                         // Cancel the download and notify the user
                         Debug.WriteLine("Network error occurred: " + ex.Message);
                     }
                 }
+
             }
             catch (Exception ex)
             {
@@ -156,8 +163,9 @@ namespace HuaweiHMSInstaller.Services
                 _adbClient.Connect(deviceIPandPort[0], Convert.ToInt32(deviceIPandPort[1]));
                 manager = new PackageManager(_adbClient, device);
             }
-            
             manager.InstallProgressChanged += installProgressChanged;
+
+            //var huaweiPackages = manager.Packages.Where(t => t.Key.Contains("huawei", StringComparison.InvariantCultureIgnoreCase));
 
             // Install the APK
             //Try to install the package file on the device with a maximum number of retries.
@@ -186,6 +194,13 @@ namespace HuaweiHMSInstaller.Services
                     retryCount++;
                 }
             }
+
+            // If the APK was not installed, throw an exception.
+            if (!installed)
+            {
+                throw new Exception("The APK could not be installed on the device.");
+            }
+            
         }
 
         private async Task RestartAdbServer()

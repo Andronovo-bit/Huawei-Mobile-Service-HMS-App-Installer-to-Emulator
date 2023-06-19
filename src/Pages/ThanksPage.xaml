@@ -6,7 +6,9 @@
              Title="Huawei Emulator Installer"
              BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.Pages.ThanksPage">
-
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" IsEnabled="False" />
+    </Shell.BackButtonBehavior>
     <ContentPage.Resources>
         <x:String x:Key="finish">&#xf11e;</x:String>
         <x:String x:Key="back">&#xf30a;</x:String>

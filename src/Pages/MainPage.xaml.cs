@@ -4,12 +4,8 @@ using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
 using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Options;
-using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Shapes;
-using Microsoft.Maui.Dispatching;
-using Microsoft.Maui.Networking;
 using Syncfusion.Maui.Popup;
-using System;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using Path = Microsoft.Maui.Controls.Shapes.Path;
@@ -44,10 +40,10 @@ public partial class MainPage : ContentPage
         this.SearchListFrameGrid.BackgroundColor = Color.FromRgba(255, 255, 255, 0.05);
         this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
 
-        CheckInternetAndAppGalleryService(AfterEventCheckInternetAndHuaweiServiceInit);
+        _ = CheckInternetAndAppGalleryService(AfterEventInternetAndHuaweiServiceCheck);
     }
     #region Internet&Huawei server check operation
-    private bool CheckInternetConnectionInit()
+    private bool CheckNetworkConnectionInit()
     {
 
         var current = Connectivity.NetworkAccess;
@@ -65,10 +61,11 @@ public partial class MainPage : ContentPage
         worker.WorkCompleted += func;
         _ = worker.DoWorkAsync(async () => await check());
     }
-    private void CheckInternetAndAppGalleryService(Worker<bool>.WorkCompletedEventHandler func)
+    private async Task CheckInternetAndAppGalleryService(Worker<bool>.WorkCompletedEventHandler func)
     {
-        var internetState = CheckInternetConnectionInit();
-        if (internetState)
+        var networkState = CheckNetworkConnectionInit();
+        var internetState = await NetworkUtils.CheckForInternetConnectionAsync();
+        if (networkState && internetState)
         {
             CheckHuaweiService(func);
         }
@@ -85,7 +82,7 @@ public partial class MainPage : ContentPage
             });
         }
     }
-    private void AfterEventCheckInternetAndHuaweiServiceInit(object sender, bool result)
+    private void AfterEventInternetAndHuaweiServiceCheck(object sender, bool result)
     {
         if (result)
         {
@@ -103,7 +100,10 @@ public partial class MainPage : ContentPage
     }
     private void Connectivity_ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
     {
-        if(e.NetworkAccess == NetworkAccess.Internet)
+        // Check if the current page is the MainPage of the application type
+        if (Shell.Current.CurrentPage is not MainPage) return;
+
+        if (e.NetworkAccess == NetworkAccess.Internet)
         {
             this.sponsorGameNotInternetorHuaweiService.IsVisible = false;
             this.sponsorGameLoader.IsVisible = true;
@@ -127,6 +127,14 @@ public partial class MainPage : ContentPage
                 this.sponsorGameNotInternetorHuaweiService.IsVisible = true;
                 this.sponsorGameNotInternetorHuaweiServiceLabel.Text = _localizationResourceManager.GetValue("huawei_server_unreachable");
                 InstallButtonEnable(false);
+                return false;
+            });
+        }
+        else
+        {
+            Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
+            {
+                _ = GetSponsorGameInfo();
                 return false;
             });
         }
@@ -170,9 +178,9 @@ public partial class MainPage : ContentPage
             InstallButtonEnable(true);
         }
     }
-    private async void OnInstallButtonClicked(object sender, EventArgs e)
+    private void OnInstallButtonClicked(object sender, EventArgs e)
     {
-       await CreateCheckingInternetConnectionPopup();
+       _ = CreateCheckingInternetConnectionPopup();
     }
     private void OnButtonClicked(object sender, EventArgs e)
     {
@@ -223,8 +231,34 @@ public partial class MainPage : ContentPage
         stackLayout.Children.Add(grid);
 
         //get popup size
+        //Set the label as the popup content
+        this.MainContentViewArea.Children.Add(popup);
+
+        popup.ContentTemplate = new DataTemplate(() =>
+        {
+            return stackLayout;
+        });
+
+        popup.Show();
 
         var resultCheckingInternetConnection = await NetworkUtils.CheckForInternetConnectionAsync();
+
+        void OkayInternetandHuaweiService()
+        {
+            animationMark.Commit(this, "ConfirmationAnimation", length: 1000);
+            label.Text = _localizationResourceManager.GetValue("internet_connection_ok");
+            stackLayout.Children.Remove(circle);
+            grid.Children.Add(checkMark);
+            Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
+            {
+                if (!popup.IsOpen) return false;
+                popup.IsOpen = false;
+                popup.Dismiss();
+                stackLayout.Children.Remove(popup);
+                Application.Current.MainPage.Navigation.PushAsync(new DownloadandInstallPage(SelectedItem), true);
+                return false;
+            });
+        }
 
         void NotInternetAndHuweiServiceState(string langKey)
         {
@@ -244,19 +278,7 @@ public partial class MainPage : ContentPage
             {
                 if (result)
                 {
-                    animationMark.Commit(this, "ConfirmationAnimation", length: 1000);
-                    label.Text = _localizationResourceManager.GetValue("internet_connection_ok");
-                    stackLayout.Children.Remove(circle);
-                    grid.Children.Add(checkMark);
-                    Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
-                    {
-                        if (!popup.IsOpen) return false;
-                        popup.IsOpen = false;
-                        popup.Dismiss();
-                        stackLayout.Children.Remove(popup);
-                        Application.Current.MainPage.Navigation.PushModalAsync(new DownloadandInstallPage(SelectedItem), true);
-                        return false;
-                    });
+                    OkayInternetandHuaweiService();
                 }
                 else
                 {
@@ -276,15 +298,7 @@ public partial class MainPage : ContentPage
             NotInternetAndHuweiServiceState("internet_connection_not_ok");
         }
 
-        //Set the label as the popup content
-        this.MainContentViewArea.Children.Add(popup);
 
-        popup.ContentTemplate = new DataTemplate(() =>
-        {
-            return stackLayout;
-        });
-
-        popup.Show();
 
     }
     // Create an animation that scales the circle and rotates the check mark
