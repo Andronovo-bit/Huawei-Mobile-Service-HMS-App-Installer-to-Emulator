@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 
-
 namespace HuaweiHMSInstaller.Helper
 {
     public static class HttpClientExtensions
@@ -44,10 +43,8 @@ namespace HuaweiHMSInstaller.Helper
 
         }
 
-        // This extension method downloads the data from the url to the file stream
-        // and reports the progress to the IProgress<float> instance
         public static async Task DownloadAsync(this IHttpClientFactory clientFactory, string url, Stream file,
-                    IProgress<float> progress = null, CancellationToken cancellationToken = default)
+                IProgress<float> progress = null, CancellationToken cancellationToken = default)
         {
             // Validate the arguments
             if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
@@ -58,6 +55,7 @@ namespace HuaweiHMSInstaller.Helper
             {
                 // Create an HttpClient instance using IHttpClientFactory
                 var httpClient = clientFactory.CreateClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(10);
 
                 using (var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken))
                 {
@@ -73,9 +71,68 @@ namespace HuaweiHMSInstaller.Helper
                     }
                 }
             }
+            catch (TaskCanceledException ex) // The request was canceled due to the timeout or the token
+            {
+                throw ex;
+            }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
+            }
+
+        }
+
+        //public static async Task<long> GetFileSizeAsync(IHttpClientFactory clientFactory, string url)
+        //{
+        //    // Validate the arguments
+        //    if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
+        //    if (url == null) throw new ArgumentNullException(nameof(url));
+        //    var httpClient = clientFactory.CreateClient();
+
+        //    httpClient.BaseAddress = new Uri(url);
+
+        //    // Send a GET request and read only the response headers
+        //    var response = await httpClient.GetAsync("", HttpCompletionOption.ResponseHeadersRead);
+
+        //    // Get the content-length value from the response
+        //    var contentLength = response.Content.Headers.ContentLength; // returns a long? value
+
+        //    return contentLength ?? 0;
+        //}
+        public static async Task<long> GetFileSizeAsync(IHttpClientFactory clientFactory, string url)
+        {
+            // Validate the arguments
+            if (clientFactory == null) throw new ArgumentNullException(nameof(clientFactory));
+            if (url == null) throw new ArgumentNullException(nameof(url));
+
+            // Create a Uri instance from the url argument
+            if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
+                throw new ArgumentException($"The URL '{url}' is not a valid URI.", nameof(url));
+
+            // Create an HttpClient instance using IHttpClientFactory
+            var httpClient = clientFactory.CreateClient();
+            try
+            {
+                // Send a GET request and read only the response headers
+                var response = await httpClient.GetAsync(uri, HttpCompletionOption.ResponseHeadersRead);
+                // Check for success
+                if (!response.IsSuccessStatusCode)
+                    throw new HttpRequestException($"The request to '{url}' failed with status code {response.StatusCode}.");
+
+                // Get the content-length value from the response
+                if (!response.Content.Headers.TryGetValues("Content-Length", out var values) || string.IsNullOrEmpty(values.FirstOrDefault()))
+                    throw new InvalidOperationException($"The URL '{url}' does not indicate a content length.");
+
+                // Parse the content-length value as a long
+                if (!long.TryParse(values.First(), out var contentLength))
+                    throw new FormatException($"The content length value '{values.First()}' is not a valid long.");
+
+                return contentLength;
+            }
+            catch(HttpRequestException ex)
+            {
+                Debug.WriteLine(ex.ToString());
+                throw ex;
             }
 
         }

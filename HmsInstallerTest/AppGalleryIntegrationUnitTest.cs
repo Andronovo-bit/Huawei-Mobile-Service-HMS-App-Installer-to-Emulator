@@ -1,4 +1,5 @@
-﻿using HuaweiHMSInstaller.Integrations;
+﻿using HuaweiHMSInstaller.Helper;
+using HuaweiHMSInstaller.Integrations;
 using HuaweiHMSInstaller.Models.MappingModels;
 using Newtonsoft.Json;
 
@@ -85,6 +86,18 @@ namespace HmsInstallerTest
             Assert.True(hasGameName);
         }
 
+        [Fact]
+        public async Task GetFileSizeAsync_Returns_ContentLength()
+        {
+            // Arrange
+            var url = "https://appgallery.cloud.huawei.com/appdl/C10132067?";
+            var contentLength = 1234L;
+
+            var downloadFileSize = await HttpClientExtensions.GetFileSizeAsync(_client, url);
+
+            // Assert
+            Assert.Equal(contentLength, downloadFileSize);
+        }
 
     }
 }
