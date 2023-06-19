@@ -595,7 +595,6 @@ public partial class DownloadandInstallPage : ContentPage
 
         if (e.NetworkAccess == NetworkAccess.Internet)
         {
-            Console.WriteLine(e.ToString());
             this.timerReconnect.IsVisible = false;
             ErrorWhenDownloadingApk = false;
         }
