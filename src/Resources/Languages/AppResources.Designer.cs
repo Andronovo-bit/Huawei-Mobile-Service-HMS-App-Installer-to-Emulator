@@ -358,6 +358,15 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Something is wrong with your internet connection, reconnecting.
+        /// </summary>
+        internal static string internet_error_reconnect {
+            get {
+                return ResourceManager.GetString("internet_error_reconnect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No search results found.
         /// </summary>
         internal static string no_search_result_found {

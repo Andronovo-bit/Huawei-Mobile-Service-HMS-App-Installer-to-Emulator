@@ -75,7 +75,7 @@
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="Syncfusion.Maui.Popup" Version="21.2.5" />
+		<PackageReference Include="Syncfusion.Maui.Popup" Version="21.1.35" />
 	</ItemGroup>
 
 

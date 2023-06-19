@@ -258,4 +258,7 @@
   <data name="huawei_server_unreachable" xml:space="preserve">
     <value>Huawei server unreachable at the moment, please try again later.</value>
   </data>
+  <data name="internet_error_reconnect" xml:space="preserve">
+    <value>Something is wrong with your internet connection, reconnecting</value>
+  </data>
 </root>

@@ -258,4 +258,7 @@
   <data name="huawei_server_unreachable" xml:space="preserve">
     <value>Servidor Huawei inaccesible en este momento, por favor inténtelo más tarde.</value>
   </data>
+  <data name="internet_error_reconnect" xml:space="preserve">
+    <value>Algo va mal con su conexión a Internet, vuelva a conectar</value>
+  </data>
 </root>

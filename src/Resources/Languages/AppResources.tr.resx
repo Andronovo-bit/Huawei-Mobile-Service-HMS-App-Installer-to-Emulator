@@ -258,4 +258,7 @@
   <data name="huawei_server_unreachable" xml:space="preserve">
     <value>Huawei sunucusuna şu anda ulaşılamıyor, lütfen daha sonra tekrar deneyin.</value>
   </data>
+  <data name="internet_error_reconnect" xml:space="preserve">
+    <value>İnternet bağlantınızla ilgili bir sorun var, yeniden bağlanıyor</value>
+  </data>
 </root>
