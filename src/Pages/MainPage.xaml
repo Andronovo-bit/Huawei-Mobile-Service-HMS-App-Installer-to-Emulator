@@ -7,7 +7,7 @@
              xmlns:lang="clr-namespace:HuaweiHMSInstaller.Resources.Languages"
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              xmlns:vm="clr-namespace:HuaweiHMSInstaller.Models"
-             Title="Huawei Emulator Installer"
+             Title="{loc:Translate huawei_emulator_installer}"
              BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.MainPage">
     

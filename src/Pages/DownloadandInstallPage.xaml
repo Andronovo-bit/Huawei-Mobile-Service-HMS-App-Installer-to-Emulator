@@ -3,7 +3,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
-             Title="Huawei Emulator Installer"
+             Title="{loc:Translate huawei_emulator_installer}"
              BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
     
