@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui;
 using HuaweiHMSInstaller.Integrations;
 using HuaweiHMSInstaller.Models;
+using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Resources.Languages;
 using HuaweiHMSInstaller.Services;
 using LocalizationResourceManager.Maui;
@@ -13,7 +14,6 @@ public static class MauiProgram
 {      
     public static MauiApp CreateMauiApp()
 	{
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("MjMzMDMzMUAzMjMxMmUzMDJlMzBlVmRiNTFydWVxTWlsMlE5aHc2WThWYWl2NG9kREdxZFJKWjFoWkNUYng0PQ==");
         var builder = MauiApp.CreateBuilder();
 		builder
 			.UseMauiApp<App>()
@@ -67,12 +67,22 @@ public static class MauiProgram
         var services = builder.Services;
         builder.Services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(),"HuaweiHMSInstaller")); //configure value
         builder.Services.Configure<GlobalOptions>(x => x.VersionNumber = "0.0.1"); //configure value
-
+        builder.RegisterViews();
         services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
         services.AddScoped<IAppGalleryIntegration, AppGalleryIntegration>();
         services.AddScoped<IAppGalleryService, AppGalleryService>();
-
+       
         return builder.Build();
 	}
+
+    public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
+    {
+        builder.Services.AddSingleton<AppShell>();
+        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<DownloadandInstallPage>();
+        builder.Services.AddSingleton<ThanksPage>();
+
+        return builder;
+    }
 }
