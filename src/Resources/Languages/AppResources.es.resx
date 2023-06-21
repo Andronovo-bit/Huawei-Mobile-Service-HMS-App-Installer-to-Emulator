@@ -124,7 +124,7 @@
     <value>Buscar Juegos</value>
   </data>
   <data name="huawei_emulator_installer" xml:space="preserve">
-    <value>Instalador del emulador de Huawei</value>
+    <value>Instalador de Huawei HMS en el emulador</value>
   </data>
   <data name="welcome_to" xml:space="preserve">
     <value>Bienvenido a</value>

@@ -127,7 +127,7 @@
     <value>Welcome to</value>
   </data>
   <data name="huawei_emulator_installer" xml:space="preserve">
-    <value>Huawei Emulator Installer</value>
+    <value>Huawei HMS Installer to Emulator</value>
   </data>
   <data name="check_internet_connection" xml:space="preserve">
     <value>Checking your internet connection</value>

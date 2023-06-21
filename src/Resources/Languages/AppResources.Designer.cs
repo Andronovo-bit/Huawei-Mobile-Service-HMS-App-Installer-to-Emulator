@@ -268,7 +268,7 @@ namespace HuaweiHMSInstaller.Resources.Languages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Huawei Emulator Installer.
+        ///   Looks up a localized string similar to Huawei HMS Installer to Emulator.
         /// </summary>
         internal static string huawei_emulator_installer {
             get {

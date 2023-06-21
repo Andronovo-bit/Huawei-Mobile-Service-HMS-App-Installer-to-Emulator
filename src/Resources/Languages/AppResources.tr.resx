@@ -124,7 +124,7 @@
     <value>Oyun Ara</value>
   </data>
   <data name="huawei_emulator_installer" xml:space="preserve">
-    <value>Huawei Emulator Kurucusu</value>
+    <value>Emülatöre Huawei HMS Yükleyici</value>
   </data>
   <data name="check_internet_connection" xml:space="preserve">
     <value>İnternet bağlantınız kontrol ediliyor</value>
