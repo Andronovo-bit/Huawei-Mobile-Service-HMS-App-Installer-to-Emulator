@@ -124,7 +124,7 @@
     <value>Oyun Ara</value>
   </data>
   <data name="huawei_emulator_installer" xml:space="preserve">
-    <value>Huawei Emulator Kurucusu</value>
+    <value>Emülatöre Huawei HMS Yükleyici</value>
   </data>
   <data name="check_internet_connection" xml:space="preserve">
     <value>İnternet bağlantınız kontrol ediliyor</value>
@@ -245,5 +245,20 @@
   </data>
   <data name="please_wait" xml:space="preserve">
     <value>Lütfen bekleyin...</value>
+  </data>
+  <data name="huawei_emulator_description" xml:space="preserve">
+    <value>Bu uygulama, Huawei Mobile Services (HMS) uygulamaları ile birlikte emülatöre Android oyunu yüklemenizi ve çalıştırmanızı sağlayan bir araçtır. Oyun Appgallery'e bağlı olarak çalışır.</value>
+  </data>
+  <data name="emulator_config_progress" xml:space="preserve">
+    <value>Cihaz (Emülatör) yapılandırması devam ediyor</value>
+  </data>
+  <data name="internet_connection_error" xml:space="preserve">
+    <value>İnternet bağlantınızla ilgili bir sorun var, lütfen düzeltin ve tekrar deneyin.</value>
+  </data>
+  <data name="huawei_server_unreachable" xml:space="preserve">
+    <value>Huawei sunucusuna şu anda ulaşılamıyor, lütfen daha sonra tekrar deneyin.</value>
+  </data>
+  <data name="internet_error_reconnect" xml:space="preserve">
+    <value>İnternet bağlantınızla ilgili bir sorun var, yeniden bağlanıyor</value>
   </data>
 </root>

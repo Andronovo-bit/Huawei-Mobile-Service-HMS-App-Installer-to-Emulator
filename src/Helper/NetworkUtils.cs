@@ -2,7 +2,7 @@
 
 namespace HuaweiHMSInstaller.Helper
 {
-    public static class CheckInternetConnection
+    public static class NetworkUtils
     {
         public static bool IsConnected()
         {
@@ -19,7 +19,7 @@ namespace HuaweiHMSInstaller.Helper
         public static async Task<bool> CheckForInternetConnectionAsync(int timeoutMs = 10000)
         {
             const string url = "http://www.gstatic.com/generate_204";
-            var client = new HttpClient();
+            using var client = new HttpClient();
             client.Timeout = TimeSpan.FromMilliseconds(timeoutMs);
             try
             {
@@ -39,7 +39,27 @@ namespace HuaweiHMSInstaller.Helper
                 return false;
             }
         }
+        public static async Task<bool> IsLinkAvailableAsync(string url)
+        {
+            // Use a using declaration to dispose the HttpClient instance.
+            using HttpClient client = new HttpClient();
 
+            // Set the Timeout property to 1 second.
+            client.Timeout = TimeSpan.FromSeconds(1);
 
+            // Try to get the response from the link using a try-catch block.
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(url);
+
+                // Check if the response is successful.
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                // Return false if any exception occurs.
+                return false;
+            }
+        }
     }
 }

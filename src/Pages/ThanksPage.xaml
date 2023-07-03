@@ -3,10 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              xmlns:popup ="clr-namespace:Syncfusion.Maui.Popup;assembly=Syncfusion.Maui.Popup"
-             Title="Huawei Emulator Installer"
+             Title="{loc:Translate huawei_emulator_installer}"
              BackgroundImageSource="huawei_background2.png"
              x:Class="HuaweiHMSInstaller.Pages.ThanksPage">
-
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" IsEnabled="False" />
+    </Shell.BackButtonBehavior>
     <ContentPage.Resources>
         <x:String x:Key="finish">&#xf11e;</x:String>
         <x:String x:Key="back">&#xf30a;</x:String>

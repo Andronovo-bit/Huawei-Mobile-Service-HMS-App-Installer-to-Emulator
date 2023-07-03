@@ -86,7 +86,7 @@ public partial class ThanksPage : ContentPage
 
     private async void ButtonBack_Clicked(object sender, EventArgs e)
     {
-        await Application.Current.MainPage.Navigation.PushModalAsync(new MainPage(), true);
+        await Application.Current.MainPage.Navigation.PushAsync(new MainPage(), true);
     }
 }
 

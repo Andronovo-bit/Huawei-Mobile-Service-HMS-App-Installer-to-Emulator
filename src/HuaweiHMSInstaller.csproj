@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFrameworks>net7.0;net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
@@ -11,6 +10,7 @@
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<LangVersion>latest</LangVersion>
+		<WinUISingleInstance>true</WinUISingleInstance>
 
 
 		<!-- Display name -->
@@ -61,6 +61,8 @@
 	  <None Remove="Resources\Fonts\FA-Free-Solid-900.otf" />
 	  <None Remove="Resources\Images\huawei_background.png" />
 	  <None Remove="Resources\Images\huawei_background2.jpg" />
+	  <None Remove="Resources\Images\no_connection.png" />
+	  <None Remove="Resources\Images\wifi.png" />
 
 	</ItemGroup>
 
@@ -73,7 +75,7 @@
 		<PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-		<PackageReference Include="Syncfusion.Maui.Popup" Version="21.2.5" />
+		<PackageReference Include="Syncfusion.Maui.Popup" Version="21.1.35" />
 	</ItemGroup>
 
 
