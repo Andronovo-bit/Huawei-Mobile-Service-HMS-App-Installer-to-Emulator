@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 using System.Text.RegularExpressions;
 
 namespace HuaweiHMSInstaller.Helper
@@ -92,10 +92,10 @@ namespace HuaweiHMSInstaller.Helper
 
             try
             {
-                using (Process Proc = new Process())
+                using (Process Proc = new())
                 {
 
-                    ProcessStartInfo StartInfo = new ProcessStartInfo();
+                    ProcessStartInfo StartInfo = new();
                     StartInfo.FileName = "netstat.exe";
                     StartInfo.Arguments = "-a -n -o";
                     StartInfo.WindowStyle = ProcessWindowStyle.Hidden;
@@ -189,7 +189,7 @@ namespace HuaweiHMSInstaller.Helper
 
         public static Process StartProcess(string FilePath)
         {
-            Process process = new Process();
+            Process process = new();
             process.StartInfo.FileName = FilePath;
             process.Start();
             return process;

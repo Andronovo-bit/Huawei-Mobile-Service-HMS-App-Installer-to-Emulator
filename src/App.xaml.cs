@@ -1,11 +1,11 @@
-﻿using HuaweiHMSInstaller.Pages;
+using HuaweiHMSInstaller.Pages;
 using System.Reflection;
 
 namespace HuaweiHMSInstaller;
 
 public partial class App : Application
 {
-    private static Mutex mutex = new Mutex(true, Assembly.GetEntryAssembly().GetName().Name);
+    private static Mutex mutex = new(true, Assembly.GetEntryAssembly().GetName().Name);
 
     public App()
 	{
