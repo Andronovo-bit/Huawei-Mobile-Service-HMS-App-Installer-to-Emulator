@@ -1,4 +1,4 @@
-﻿using HuaweiHMSInstaller.Helper;
+using HuaweiHMSInstaller.Helper;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
@@ -372,7 +372,7 @@ public partial class MainPage : ContentPage
     }
     private void CreatePathLineSegment(out Path path, Point startPoint, List<Point> points, Color color)
     {
-        PathSegmentCollection pathSegmentCollection = new PathSegmentCollection();
+        PathSegmentCollection pathSegmentCollection = new();
         foreach (var point in points)
         {
             pathSegmentCollection.Add(new LineSegment { Point = point });

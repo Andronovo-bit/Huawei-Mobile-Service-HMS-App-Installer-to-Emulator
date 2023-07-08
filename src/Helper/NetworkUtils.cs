@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 
 namespace HuaweiHMSInstaller.Helper
 {
@@ -42,7 +42,7 @@ namespace HuaweiHMSInstaller.Helper
         public static async Task<bool> IsLinkAvailableAsync(string url)
         {
             // Use a using declaration to dispose the HttpClient instance.
-            using HttpClient client = new HttpClient();
+            using HttpClient client = new();
 
             // Set the Timeout property to 1 second.
             client.Timeout = TimeSpan.FromSeconds(1);
