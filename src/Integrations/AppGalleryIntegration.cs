@@ -1,15 +1,14 @@
 ﻿using HuaweiHMSInstaller.Helper;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Maui;
 using System.Web;
 
 namespace HuaweiHMSInstaller.Integrations
 {
-    public class AppGalleryIntegration: IAppGalleryIntegration
+    public class AppGalleryIntegration : IAppGalleryIntegration
     {
         // Define the parameters for the function call
-        private const string BaseUrl = "https://web-dre.hispace.dbankcloud.cn/uowap/index";
-
+        private const string BASE_URL = "https://web-dre.hispace.dbankcloud.cn";
+        private const string APPGALLERY_CLOUD_URL = "https://appgallery.cloud.huawei.com";
 
         private readonly MemoryCache cache = new(new MemoryCacheOptions());
         private readonly IHttpClientFactory _httpClientFactory;
@@ -28,8 +27,12 @@ namespace HuaweiHMSInstaller.Integrations
             // Use HttpClientFactory to create an HttpClient instance
             var _httpClient = _httpClientFactory.CreateClient();
 
+            var InterfaceCode = await GetInterfaceCodeAsync();
+            // Add headers to the HttpClient instance
+            _httpClient.DefaultRequestHeaders.Add("Interface-Code", InterfaceCode);
+
             // Use UriBuilder and HttpUtility to construct the URL and query string
-            var urlBuilder = new UriBuilder(BaseUrl);
+            var urlBuilder = new UriBuilder(BASE_URL + "/uowap/index");
             var queryParameters = HttpUtility.ParseQueryString(string.Empty);
             queryParameters["method"] = method;
             queryParameters["serviceType"] = serviceType;
@@ -85,8 +88,12 @@ namespace HuaweiHMSInstaller.Integrations
             // Use HttpClientFactory to create an HttpClient instance
             var _httpClient = _httpClientFactory.CreateClient();
 
+            var InterfaceCode = await GetInterfaceCodeAsync();
+            // Add headers to the HttpClient instance
+            _httpClient.DefaultRequestHeaders.Add("Interface-Code", InterfaceCode);
+
             // Define the base URL and query parameters as constants
-            const string url = BaseUrl;
+            const string url = BASE_URL + "/uowap/index";
             const string method = "internal.getTabDetail";
             const string serviceType = "20";
             const string reqPageNum = "1";
@@ -142,13 +149,18 @@ namespace HuaweiHMSInstaller.Integrations
                 }
             }
         }
-    
+
         public async Task<string> GetDetailAppInAppGalleryAsync(string appId, string locale)
         {
             // Use HttpClientFactory to create an HttpClient instance
             using var _httpClient = _httpClientFactory.CreateClient();
+
+            var InterfaceCode = await GetInterfaceCodeAsync();
+            // Add headers to the HttpClient instance
+            _httpClient.DefaultRequestHeaders.Add("Interface-Code", InterfaceCode);
+
             // Create a UriBuilder with the base URL
-            var uriBuilder = new UriBuilder(BaseUrl);
+            var uriBuilder = new UriBuilder(BASE_URL + "/uowap/index");
 
             // Create a NameValueCollection with the query parameters
             var query = HttpUtility.ParseQueryString(string.Empty);
@@ -198,7 +210,51 @@ namespace HuaweiHMSInstaller.Integrations
             }
 
         }
-    
-        public async Task<bool> CheckBaseUrlAsync() => await NetworkUtils.IsLinkAvailableAsync($"{BaseUrl}?method=internal.getTabDetail&serviceType=20");
+
+        public async Task<bool> CheckBaseUrlAsync()
+        {
+            var InterfaceCode = await GetInterfaceCodeAsync();
+            var result = await NetworkUtils.IsLinkAvailableAsync($"{BASE_URL}/uowap/index?method=internal.getTabDetail&serviceType=20", InterfaceCode);
+            return result;
+        }
+
+        public async Task<bool> CheckCloudUrlAsync()
+        {
+            var InterfaceCode = await GetInterfaceCodeAsync();
+            var result = await NetworkUtils.IsLinkAvailableAsync(APPGALLERY_CLOUD_URL, InterfaceCode);
+            return result;
+        }
+        public async Task<string> GetInterfaceCodeAsync()
+        {
+            // Use HttpClientFactory to create an HttpClient instance
+            using var _httpClient = _httpClientFactory.CreateClient();
+
+            // Create a UriBuilder with the base URL
+            var uriBuilder = new UriBuilder($"{BASE_URL}/webedge/getInterfaceCode");
+
+            // Create a NameValueCollection with the query parameters
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["locale"] = "en";
+
+            // Assign the query string to the UriBuilder
+            uriBuilder.Query = query.ToString();
+
+            // Use async and await with using to dispose of the HttpResponseMessage object
+            using var response = await _httpClient.GetAsync(uriBuilder.Uri);
+
+            // Throw an exception if the status code is not successful
+            response.EnsureSuccessStatusCode();
+
+            // Read and return the response content as a string
+            var result = await response.Content.ReadAsStringAsync();
+
+            //fix the string
+            result = result.Replace("\"", "");
+
+            var timeStamps = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString();
+
+            return $"{result}_{timeStamps}";
+
+        }
     }
 }
