@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace HuaweiHMSInstaller.Integrations
+﻿namespace HuaweiHMSInstaller.Integrations
 {
     public interface IAppGalleryIntegration
     {
@@ -12,5 +6,6 @@ namespace HuaweiHMSInstaller.Integrations
         Task<string> AdvancedSearchAppInAppGalleryAsync(string keyword, string locale);
         Task<string> GetDetailAppInAppGalleryAsync(string appId, string locale);
         Task<bool> CheckBaseUrlAsync();
+        Task<bool> CheckCloudUrlAsync();
     }
 }

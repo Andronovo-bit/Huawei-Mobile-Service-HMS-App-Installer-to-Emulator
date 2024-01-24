@@ -39,10 +39,13 @@ namespace HuaweiHMSInstaller.Helper
                 return false;
             }
         }
-        public static async Task<bool> IsLinkAvailableAsync(string url)
+        public static async Task<bool> IsLinkAvailableAsync(string url, string interfaceCode = null)
         {
             // Use a using declaration to dispose the HttpClient instance.
             using HttpClient client = new();
+
+            // Add headers to the HttpClient instance
+            client.DefaultRequestHeaders.Add("Interface-Code", interfaceCode);
 
             // Set the Timeout property to 10 second.
             client.Timeout = TimeSpan.FromSeconds(10);

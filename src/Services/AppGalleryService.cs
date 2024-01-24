@@ -1,14 +1,11 @@
-﻿using HuaweiHMSInstaller.Helper;
-using HuaweiHMSInstaller.Integrations;
-using HuaweiHMSInstaller.Models;
+﻿using HuaweiHMSInstaller.Integrations;
 using HuaweiHMSInstaller.Models.MappingModels;
 using Newtonsoft.Json;
 
 namespace HuaweiHMSInstaller.Services
 {
-    public class AppGalleryService: IAppGalleryService
+    public class AppGalleryService : IAppGalleryService
     {
-        private const string APPGALLERYCLOUDURL = "https://appgallery.cloud.huawei.com";
         // Dependency injection to create Appgallery instance
         private readonly IAppGalleryIntegration _appGalleryIntegration;
 
@@ -21,7 +18,7 @@ namespace HuaweiHMSInstaller.Services
         {
             //get system local language
             var language = System.Globalization.CultureInfo.CurrentCulture.TwoLetterISOLanguageName;
-            var result = await _appGalleryIntegration.AdvancedSearchAppInAppGalleryAsync(keyword,language);
+            var result = await _appGalleryIntegration.AdvancedSearchAppInAppGalleryAsync(keyword, language);
             var mappingResult = JsonConvert.DeserializeObject<AppGalleryAdvancedSearchResult>(result);
             return mappingResult;
         }
@@ -36,6 +33,6 @@ namespace HuaweiHMSInstaller.Services
         }
 
         public async Task<bool> CheckAppGalleryServiceAsync() => await _appGalleryIntegration.CheckBaseUrlAsync();
-        public async Task<bool> CheckAppGalleryCloudServiceAsync() => await NetworkUtils.IsLinkAvailableAsync(APPGALLERYCLOUDURL);
+        public async Task<bool> CheckAppGalleryCloudServiceAsync() => await _appGalleryIntegration.CheckCloudUrlAsync();
     }
 }
