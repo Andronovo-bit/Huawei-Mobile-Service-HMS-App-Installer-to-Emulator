@@ -261,4 +261,7 @@
   <data name="internet_error_reconnect" xml:space="preserve">
     <value>İnternet bağlantınızla ilgili bir sorun var, yeniden bağlanıyor</value>
   </data>
+  <data name="settings" xml:space="preserve">
+    <value>Ayarlar</value>
+  </data>
 </root>

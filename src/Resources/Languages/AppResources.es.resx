@@ -261,4 +261,7 @@
   <data name="internet_error_reconnect" xml:space="preserve">
     <value>Algo va mal con su conexión a Internet, vuelva a conectar</value>
   </data>
+  <data name="settings" xml:space="preserve">
+    <value>Configuraciones</value>
+  </data>
 </root>
