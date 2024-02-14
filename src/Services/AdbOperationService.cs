@@ -176,7 +176,7 @@ namespace HuaweiHMSInstaller.Services
             {
                 try
                 {
-                    manager.InstallPackage(packageFilePath, false);
+                    manager.InstallPackage(packageFilePath, true);
                     installed = true;
                 }
                 catch (Exception ex)
@@ -185,6 +185,12 @@ namespace HuaweiHMSInstaller.Services
                     {
                         installed = true;
                         continue;
+                    }
+
+                    if(ex.Message.Contains("INSTALL_FAILED_UPDATE_INCOMPATIBLE"))
+                    {
+                        //TODO : Find uninstall package name using adb command
+                        manager.UninstallPackage("com.huawei.hwid");
                     }
 
                     // Catch any exceptions that occur during installation and restart the ADB server.
@@ -198,7 +204,9 @@ namespace HuaweiHMSInstaller.Services
             // If the APK was not installed, throw an exception.
             if (!installed)
             {
-                throw new Exception("The APK could not be installed on the device.");
+                var packageName = Path.GetFileNameWithoutExtension(packageFilePath);
+                
+                throw new Exception($"The APK ({packageName}) could not be installed on the device.");
             }
             
         }
