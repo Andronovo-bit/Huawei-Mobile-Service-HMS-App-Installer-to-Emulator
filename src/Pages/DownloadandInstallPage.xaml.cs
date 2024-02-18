@@ -2,9 +2,9 @@ using AdvancedSharpAdbClient;
 using HuaweiHMSInstaller.Helper;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
+using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Options;
-using System;
 using System.Diagnostics;
 using System.Text;
 using static AdvancedSharpAdbClient.DeviceCommands.PackageManager;
@@ -12,90 +12,120 @@ using ServiceProvider = HuaweiHMSInstaller.Services.ServiceProvider;
 
 namespace HuaweiHMSInstaller.Pages;
 
-public partial class DownloadandInstallPage : ContentPage
+public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
 {
+    public SearchListItem SearchListItem { get; set; }
+
     #region Definations
-    private const string AdbFolder = "adb_server";
-    private const long AdbFileSize = 5938176;
     // Define an array of messages for each progress range
     private Dictionary<string, bool> AdbProgressMessages;
     private string[] hmsInfoMessage;
-	// Define an array of progress thresholds for each message
-	private int[] thresholds;
-	private readonly double[] thresholdsHmsInfo = new double[] { 20, 40, 60, 70, 80 };
-    private Dictionary<string,bool> checkHmsOperation = new();
-    private List<InstallApkModel> apkRecords = new();
+    // Define an array of progress thresholds for each message
+    private int[] thresholds;
+    private readonly double[] thresholdsHmsInfo = new double[] { 20, 40, 60, 70, 80 };
+    private List<InstallApkModel> apkRecords;
+    private Dictionary<string, bool> checkHmsOperation;
+
     // Initialize variables to keep track of the current message index
-    private int index = 0;
-	private int indexHmsInfo = 0;
-	private double globalProgress = 0;
-	// Use StringBuilder for string concatenation
-	private StringBuilder commentBuilder = new ();
-	private StringBuilder hmsInfoBuilder = new ();
+    private int currentThresholdIndex = 0;
+    private int currentHmsInfoIndex = 0;
+    private double globalProgress = 0;
+    // Use StringBuilder for string concatenation
+    private StringBuilder commentBuilder;
+    private StringBuilder hmsInfoBuilder;
 
-	private string adbPath;
-	private string adbFolderPath;
-	//HMS Links
-	private const string AppGallery = "https://appgallery.cloud.huawei.com/appdl/C27162?";
-	private const string HmsCore = "https://appgallery.cloud.huawei.com/appdl/C10132067?";
+    //HMS Links
+    private const string AppGallery = "https://appgallery.cloud.huawei.com/appdl/C27162?";
+    private const string HmsCore = "https://appgallery.cloud.huawei.com/appdl/C10132067?";
 
-	private string InstallGame;
+    private string InstallGameUrl;
     private string GameName;
-    private readonly SearchListItem GameItem;
+    private SearchListItem GameItem;
 
     private CancellationTokenSource cancellationTokenSrc;
-    private bool ErrorWhenDownloadingApk; 
+    private bool ErrorWhenDownloadingApk;
     private List<DeviceData> adbDevices = Enumerable.Empty<DeviceData>().ToList();
 
     #endregion
 
     private readonly IAdbOperationService _adbOperationService;
     private readonly IAppGalleryService _appGalleryService;
-	private readonly GlobalOptions _options;
+    private readonly GlobalOptions _options;
     private readonly ILocalizationResourceManager _localizationResourceManager;
     private readonly IHttpClientFactory _httpClient;
+    private readonly DownloadAndInstallPageViewModel _viewModel;
 
-    public DownloadandInstallPage(SearchListItem item)
-	{
+    public DownloadandInstallPage(DownloadAndInstallPageViewModel viewModel)
+    {
+        Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
+
+        InitializeComponent();
         _adbOperationService = ServiceProvider.GetService<IAdbOperationService>();
         _appGalleryService = ServiceProvider.GetService<IAppGalleryService>();
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
         _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
         _httpClient = ServiceProvider.GetService<IHttpClientFactory>();
-
-        GameItem = item;
-        Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
-
-        InitializeComponent();
-        Init();
+        _viewModel = viewModel;
+        this.NavigatedTo += (s, e) => Initialize();
 
     }
 
-    private void Init()
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        if (query.ContainsKey("SearchListItem"))
+        {
+            SearchListItem = query["SearchListItem"] as SearchListItem;
+        }
+        OnPropertyChanged(nameof(SearchListItem));
+    }
+
+    private void Initialize()
+    {
+        // Assign the game item
+        GameItem = SearchListItem;
+
+        // Initialize variables
         ErrorWhenDownloadingApk = false;
-        InstallGame = $"https://appgallery.cloud.huawei.com/appdl/{GameItem.AppId}?";
+        InstallGameUrl = $"https://appgallery.cloud.huawei.com/appdl/{GameItem.AppId}?";
         GameName = GameItem.Name;
 
-        AdbProgressMessages = AdbMessagesConst.InitializeMessages();
+        // Set up progress messages and handlers
+        AdbProgressMessages = _viewModel.AdbProgressMessages;
         hmsInfoMessage = HmsInfoMessagesConst.InitializeMessages();
+        _viewModel.OnProgressChanged = UpdateProgress;
+        _viewModel.OnThresholdReached = PerformThresholdOperation;
 
-        ThresholdOperation();
-        adbPath = Path.Combine(_options.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
-        adbFolderPath = Path.Combine(_options.ProjectOperationPath, AdbFolder);
+        // Initialize progress-related variables
+        thresholds = null;
+        currentThresholdIndex = 0;
+        currentHmsInfoIndex = 0;
+        globalProgress = 0;
+        this.progressBar.Progress = globalProgress;
 
+        // Initialize builders and collections
+        commentBuilder = new StringBuilder();
+        hmsInfoBuilder = new StringBuilder();
+        apkRecords = new List<InstallApkModel>();
+        checkHmsOperation = new Dictionary<string, bool>();
+
+        // Perform the initial threshold operation
+        PerformThresholdOperation();
+
+        // Start the download and install operation asynchronously
         Dispatcher.DispatchAsync(async () =>
         {
             await DownloadAndInstallOperationAsync();
         });
     }
-	private async Task DownloadAndInstallOperationAsync(){
+    private async Task DownloadAndInstallOperationAsync()
+    {
 
-		//label add ... animation use behavior
-		this.dotAnimation.Behaviors.Add(new DotAnimationBehavior());
+        //label add ... animation use behavior
+        this.dotAnimation.Behaviors.Add(new DotAnimationBehavior());
         this.commentLabel.Text = _localizationResourceManager.GetValue("emulator_config_progress");
 
-        var adbDevices = await AdbServerandDeviceCheckAsync();
+        var adbDevices = await _viewModel.AdbServerandDeviceCheckAsync();
+
 
         if (adbDevices is null or { Count: 0 })
         {
@@ -116,17 +146,6 @@ public partial class DownloadandInstallPage : ContentPage
             }
         }
     }
-    private async ValueTask<List<DeviceData>> AdbServerandDeviceCheckAsync() {
-
-        var adbServerCheck = await AdbServerOperationAsync();
-
-        if (adbServerCheck)
-        {
-            adbDevices = await _adbOperationService.GetDevices();
-        }
-
-        return adbDevices;
-    }
     private async Task DownloadandInstallHmsAppsAndNavigateAsync(DeviceData device)
     {
         try
@@ -137,9 +156,10 @@ public partial class DownloadandInstallPage : ContentPage
                 await InstallHmsAppsAsync(device);
                 await FakeProgressAsync();
                 await Task.Delay(2000);
-                await Application.Current.MainPage.Navigation.PushAsync(new ThanksPage(), true);
+                _viewModel.NavigateToThanksPage();
             }
-        }catch(Exception ex)
+        }
+        catch (Exception ex)
         {
             Debug.WriteLine(ex.Message);
         }
@@ -156,96 +176,38 @@ public partial class DownloadandInstallPage : ContentPage
         this.progressBar.Progress = realValue;
 
         // If the progress exceeds the current threshold, increment the message index
-        if (globalProgress >= thresholds[index] / 100f)
+        if (globalProgress >= thresholds[currentThresholdIndex] / 100f)
         {
-            index++;
+            currentThresholdIndex++;
         }
-        if (globalProgress >= thresholdsHmsInfo[indexHmsInfo] / 100f)
+        if (globalProgress >= thresholdsHmsInfo[currentHmsInfoIndex] / 100f)
         {
-            indexHmsInfo++;
+            currentHmsInfoIndex++;
         }
 
         // Update the comment label text based on the current message index
         commentBuilder.Clear();
-        commentBuilder.Append(AdbProgressMessages.ElementAt(index).Key);
+        commentBuilder.Append(AdbProgressMessages.ElementAt(currentThresholdIndex).Key);
         this.commentLabel.Text = commentBuilder.ToString();
 
         // Update the HMS info label text based on the current message index
         hmsInfoBuilder.Clear();
-        hmsInfoBuilder.Append(hmsInfoMessage[indexHmsInfo]);
+        hmsInfoBuilder.Append(hmsInfoMessage[currentHmsInfoIndex]);
         this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
     }
-    // Define a method to disable the adb progress messages and update the thresholds
-    private void DisableAdbProgressMessages()
-    {
-        AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
-        AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
-        ThresholdOperation();
-    }
-    // Define a method to perform the adb server operation asynchronously
-    private async ValueTask<bool> AdbServerOperationAsync()
-    {
-        // Create a progress object that invokes the UpdateProgress method
-        IProgress<float> progressAdb = new Progress<float>(UpdateProgress);
 
-        // Check if the adb server is running
-        var adbServerCheck = _adbOperationService.CheckAdbServer();
-
-        try
-        {
-            if (!adbServerCheck)
-            {
-                // Check if the adb folder file exists
-                var hasAdbFolderFile = AdbFolderFileCheckOperation();
-
-                if (!hasAdbFolderFile)
-                {
-                    // Download the adb from internet and check again
-                    await _adbOperationService.DownloadAdbFromInternetAsync(progressAdb);
-                    hasAdbFolderFile = AdbFolderFileCheckOperation();
-                }
-
-                if (hasAdbFolderFile)
-                {
-                    // Start the adb server and check the status
-                    var status = AdbServer.Instance.StartServer(adbPath, true);
-
-                    if (status == StartServerResult.Started || status == StartServerResult.AlreadyRunning)
-                    {
-                        // Disable the adb progress messages and create an adb client
-                        DisableAdbProgressMessages();
-                        adbServerCheck = true;
-                        await _adbOperationService.CreateAdbClient();
-                    }
-                }
-            }
-            else
-            {
-                // Disable the adb progress messages, update the thresholds and create an adb client
-                DisableAdbProgressMessages();
-                ThresholdOperation();
-                await _adbOperationService.CreateAdbClient();
-            }
-        }
-        catch (Exception)
-        {
-            // Kill the adb process and retry the operation
-            WorkingProcessAndPort.KillProcess("adb");
-            await AdbServerOperationAsync();
-        }
-
-        return adbServerCheck;
-    }
-    private async Task ResettingDownloadApkOperationAsync() 
+    private async Task ResettingDownloadApkOperationAsync()
     {
         this.timerReconnect.IsVisible = false;
         var totalApp = AdbProgressMessages.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.Count; //7   
 
         var files = Directory.GetFiles(_options.ProjectOperationPath);
 
-        foreach(var record in apkRecords){
+        foreach (var record in apkRecords)
+        {
             var file = files.FirstOrDefault(x => x.Contains(record.Name));
-            if(file != null) {
+            if (file != null)
+            {
                 await CheckApkFileSizeAsync(record);
             }
 
@@ -257,8 +219,8 @@ public partial class DownloadandInstallPage : ContentPage
 
         if (installedApp == 0) return;
 
-        index = 0;
-        indexHmsInfo = 0;
+        currentThresholdIndex = 0;
+        currentHmsInfoIndex = 0;
 
         //var realValue = thresholds[installedApp - 1] / 100.0;
 
@@ -268,7 +230,7 @@ public partial class DownloadandInstallPage : ContentPage
     }
 
     #region Common
-    private void ThresholdOperation()
+    private void PerformThresholdOperation()
     {
         var keys = AdbProgressMessages.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
         var count = keys.Count;
@@ -276,7 +238,7 @@ public partial class DownloadandInstallPage : ContentPage
         thresholds = keys.Select(x => keys.IndexOf(x) * factor + factor).ToArray();
         thresholds[^1] = Math.Max(thresholds[^1], 101);
         // all keys add in with false value checkHmsOperation
-        checkHmsOperation =  keys.ToDictionary(x => x, x => false);
+        checkHmsOperation = keys.ToDictionary(x => x, x => false);
     }
     private void UpdateProgressBar(float value, Queue<double> queueProgress)
     {
@@ -299,30 +261,30 @@ public partial class DownloadandInstallPage : ContentPage
             this.progressBar.Progress = globalProgress;
         }));
 
-        if (thresholds.Length == index) return;
+        if (thresholds.Length == currentThresholdIndex) return;
 
-        if (globalProgress >= thresholds[index] / 100f)
+        if (globalProgress >= thresholds[currentThresholdIndex] / 100f)
         {
-            index++;
+            currentThresholdIndex++;
         }
-        if (thresholdsHmsInfo.Length == indexHmsInfo) return;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-        if (globalProgress >= thresholdsHmsInfo[indexHmsInfo] / 100f)
+        if (thresholdsHmsInfo.Length == currentHmsInfoIndex) return;
+        if (globalProgress >= thresholdsHmsInfo[currentHmsInfoIndex] / 100f)
         {
-            indexHmsInfo++;
+            currentHmsInfoIndex++;
         }
         queueProgress.Enqueue(Math.Round(value / thresholds.Length, 3));
-        
+
     }
     private void UpdateCommentLabel()
     {
         // Update the message
         // Update the comment label text based on the current progress and message index
         var adbProgressMsg = AdbProgressMessages.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
-        if (adbProgressMsg.Count > index)
+        if (adbProgressMsg.Count > currentThresholdIndex)
         {
             commentBuilder.Clear();
-            var value = adbProgressMsg[index];
-            if(value == AdbMessagesConst.DownloadingGame || value == AdbMessagesConst.InstallingGame)
+            var value = adbProgressMsg[currentThresholdIndex];
+            if (value == AdbMessagesConst.DownloadingGame || value == AdbMessagesConst.InstallingGame)
             {
                 value += ": " + GameName;
             }
@@ -335,12 +297,12 @@ public partial class DownloadandInstallPage : ContentPage
     }
     private void UpdateHMSInfoLabel()
     {
+        int index = currentHmsInfoIndex < hmsInfoMessage.Length ? currentHmsInfoIndex : (currentHmsInfoIndex != 0 ? currentHmsInfoIndex - 1 : 0);
+        string message = hmsInfoMessage[index];
 
-        hmsInfoBuilder.Clear();
-        hmsInfoBuilder.Append(hmsInfoMessage[indexHmsInfo >= hmsInfoBuilder.Length ? (indexHmsInfo != 0 ? indexHmsInfo - 1 : indexHmsInfo) : indexHmsInfo]);
         Dispatcher.Dispatch(delegate
         {
-            this.HMSInfoLabel.Text = hmsInfoBuilder.ToString();
+            this.HMSInfoLabel.Text = message;
         });
     }
     private async Task FakeProgressAsync()
@@ -363,20 +325,6 @@ public partial class DownloadandInstallPage : ContentPage
         long fileSize = fileInfo.Length;
         var downloadFileSize = await HttpClientExtensions.GetFileSizeAsync(_httpClient, url);
         return fileSize == downloadFileSize;
-    }
-    private bool AdbFolderFileCheckOperation()
-    {
-        var hasAdbFolder = Directory.Exists(adbFolderPath);
-        var hasAdbFile = File.Exists(adbPath);
-
-        if (hasAdbFolder && hasAdbFile)
-        {
-            var adbFolderFileCount = Directory.GetFiles(Path.Combine(adbFolderPath, "platform-tools"))?.Length; //must be 15
-            var adbFileSize = new FileInfo(adbPath).Length;
-            if (adbFolderFileCount == 15 && adbFileSize == AdbFileSize) return true;
-        }
-        return false;
-
     }
     private async Task AlertForNotHaveAdbDevices()
     {
@@ -451,7 +399,7 @@ public partial class DownloadandInstallPage : ContentPage
         {
             new($"{nameof(HmsCore)}.apk", HmsCore, AdbMessagesConst.DownloadingHMSCore),
             new($"{nameof(AppGallery)}.apk", AppGallery, AdbMessagesConst.DownloadingHMSAppGallery),
-            new($"{GameItem.AppId}.apk", InstallGame, AdbMessagesConst.DownloadingGame)
+            new($"{GameItem.AppId}.apk", InstallGameUrl, AdbMessagesConst.DownloadingGame)
         };
         var queueProgress = new Queue<double>();
 
@@ -475,7 +423,7 @@ public partial class DownloadandInstallPage : ContentPage
         }
 
 
-        ThresholdOperation();
+        PerformThresholdOperation();
 
         var apkRecordNotInstalled = apkRecords.Where(t => !t.IsDownloaded).ToList();
 
@@ -516,7 +464,7 @@ public partial class DownloadandInstallPage : ContentPage
         if (exist)
         {
             AdbProgressMessages[model.Description] = false;
-            ThresholdOperation();
+            PerformThresholdOperation();
         }
     }
     private IProgress<float> ProgressBarOperation(Queue<double> queueProgress)
@@ -533,9 +481,11 @@ public partial class DownloadandInstallPage : ContentPage
         cancellationTokenSrc = new();
         try
         {
-           await _adbOperationService.DownloadApkFromInternetAsync(url, fileName, progress, cancellationTokenSrc.Token);
+            await _adbOperationService.DownloadApkFromInternetAsync(url, fileName, progress, cancellationTokenSrc.Token);
 
-        }catch(TaskCanceledException ex) {
+        }
+        catch (TaskCanceledException ex)
+        {
             // Check if the cancellation was requested by the token
             if (ex.CancellationToken == cancellationTokenSrc.Token)
             {
@@ -549,7 +499,7 @@ public partial class DownloadandInstallPage : ContentPage
         }
     }
     #endregion
-	
+
     #region InstallHMSApps
     ///TODO If losted device connection, try again connect same device automaticly one time but if still don't have connection show an error popup.
     private async Task InstallHmsAppsAsync(DeviceData device)
@@ -560,12 +510,13 @@ public partial class DownloadandInstallPage : ContentPage
         //Progress
         for (int i = 0; i < apkPaths.Length; i++)
         {
-            ProgressHandler progressHMSApps = (o,v) => {
-				float value = Convert.ToSingle(v)/100;
-				UpdateProgressBar(value, queueProgress);
-				UpdateCommentLabel();
-				UpdateHMSInfoLabel();
-			};
+            ProgressHandler progressHMSApps = (o, v) =>
+            {
+                float value = Convert.ToSingle(v) / 100;
+                UpdateProgressBar(value, queueProgress);
+                UpdateCommentLabel();
+                UpdateHMSInfoLabel();
+            };
             //var p = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), apkPaths[i]);
             apkPaths[i] = Path.Combine(_options.ProjectOperationPath, apkPaths[i]);
             await InstallApkToDeviceAsync(apkPaths[i], progressHMSApps, device);
@@ -579,9 +530,9 @@ public partial class DownloadandInstallPage : ContentPage
             _adbOperationService.InstallApkToDevice(apkPath, InstallProgressChanged, device);
         });
 
-     }
+    }
     #endregion
-    
+
     private void ButtonCancel_Clicked(object sender, EventArgs e)
     {
         //Cancel the operation this page

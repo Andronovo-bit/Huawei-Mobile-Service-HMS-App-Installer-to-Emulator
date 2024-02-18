@@ -79,12 +79,17 @@ public static class MauiProgram
         return builder.Build();
     }
 
-   public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
+    public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<AppShell>();
-        builder.Services.AddSingleton<MainPage>();
-        builder.Services.AddSingleton<DownloadandInstallPage>();
-        builder.Services.AddSingleton<ThanksPage>();
+        builder.Services.AddSingletonWithShellRoute<MainPage, MainViewModel>(nameof(MainPage));
+        builder.Services.AddSingletonWithShellRoute<DownloadandInstallPage, DownloadAndInstallPageViewModel>(nameof(DownloadandInstallPage));
+        builder.Services.AddSingletonWithShellRoute<ThanksPage, ThanksPageViewModel>(nameof(ThanksPage));
+
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<DownloadAndInstallPageViewModel>();
+        builder.Services.AddTransient<ThanksPageViewModel>();
+
 
         return builder;
     }

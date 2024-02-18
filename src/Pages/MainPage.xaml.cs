@@ -2,6 +2,7 @@ using HuaweiHMSInstaller.Helper;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
+using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Options;
 using Microsoft.Maui.Controls.Shapes;
@@ -23,14 +24,16 @@ public partial class MainPage : ContentPage
     private Frame SearchListFrame;
     private readonly ILocalizationResourceManager _localizationResourceManager;
     private readonly GlobalOptions _options;
-    public MainPage()
+    private readonly MainViewModel _mainViewModel;
+    public MainPage(MainViewModel mainViewModel)
     {
         Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
 
+        InitializeComponent();
         _appGalleryService = ServiceProvider.GetService<IAppGalleryService>();
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
         _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
-        InitializeComponent();
+        _mainViewModel = mainViewModel;
         Init();
     }
     private void Init()
@@ -255,7 +258,7 @@ public partial class MainPage : ContentPage
                 popup.IsOpen = false;
                 popup.Dismiss();
                 stackLayout.Children.Remove(popup);
-                Application.Current.MainPage.Navigation.PushAsync(new DownloadandInstallPage(SelectedItem), true);
+                _mainViewModel.NavigateToDownloadAndInstallPage(SelectedItem);
                 return false;
             });
         }

@@ -5,7 +5,9 @@
              xmlns:loc="clr-namespace:LocalizationResourceManager.Maui;assembly=LocalizationResourceManager.Maui"
              Title="{loc:Translate huawei_emulator_installer}"
              BackgroundImageSource="huawei_background2.png"
-             x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage">
+             x:Class="HuaweiHMSInstaller.Pages.DownloadandInstallPage"
+             xmlns:viewmodel="clr-namespace:HuaweiHMSInstaller.ViewModels"
+             x:DataType="viewmodel:DownloadAndInstallPageViewModel">
     
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" IsEnabled="False" />
