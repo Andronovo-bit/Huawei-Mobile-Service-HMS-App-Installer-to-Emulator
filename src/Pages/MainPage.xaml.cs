@@ -16,7 +16,7 @@ namespace HuaweiHMSInstaller;
 public partial class MainPage : ContentPage
 {
     private SfPopup _sfPopup;
-    private Button footerButton = new ();
+    private Button footerButton = new();
     private readonly IAppGalleryService _appGalleryService;
     private ObservableCollection<SearchListItem> FilteredItems = new();
 
@@ -154,8 +154,10 @@ public partial class MainPage : ContentPage
     private async Task GetSponsorGameInfo()
     {
         var gameAppId = _options.SponsorGameAppId;
-        if(gameAppId != null)
+        if (gameAppId != null)
         {
+            this.selectedGameFrame.IsVisible = true;
+            this.searchBar.IsVisible = false;
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             var result = await _appGalleryService.GetAppDetail(gameAppId);
             var selectedGame = new SearchListItem();
@@ -183,13 +185,13 @@ public partial class MainPage : ContentPage
     }
     private void OnInstallButtonClicked(object sender, EventArgs e)
     {
-       _ = CreateCheckingInternetConnectionPopup();
+        _ = CreateCheckingInternetConnectionPopup();
     }
     private void OnButtonClicked(object sender, EventArgs e)
     {
         _sfPopup.IsOpen = false;
         _sfPopup.Dismiss();
-       _ = CreateCheckingInternetConnectionPopup(); 
+        _ = CreateCheckingInternetConnectionPopup();
     }
     private async Task CreateCheckingInternetConnectionPopup()
     {
@@ -365,10 +367,10 @@ public partial class MainPage : ContentPage
     private void CheckAndWrongMarkCreation(out Path checkMark, out Path wrongMark)
     {
         // Create a check mark path shape
-        CreatePathLineSegment(out checkMark, 
-                                new Point(10, 50), new List<Point> { new Point(40, 80), new Point(90, 20) }, 
+        CreatePathLineSegment(out checkMark,
+                                new Point(10, 50), new List<Point> { new Point(40, 80), new Point(90, 20) },
                                 Colors.Green);
-        CreatePathLineSegment(out wrongMark, 
+        CreatePathLineSegment(out wrongMark,
                                 new Point(10, 10), new List<Point> { new Point(90, 90), new Point(90, 10), new Point(10, 90) },
                                 Colors.Red);
 
@@ -393,7 +395,8 @@ public partial class MainPage : ContentPage
             HeightRequest = 100
         };
     }
-    private void PopupOperation(ref SfPopup popup){
+    private void PopupOperation(ref SfPopup popup)
+    {
         popup.AutoSizeMode = PopupAutoSizeMode.Height;
         popup.OverlayMode = PopupOverlayMode.Transparent;
         popup.PopupStyle = new PopupStyle
@@ -410,7 +413,7 @@ public partial class MainPage : ContentPage
         popup.HeaderTemplate = new DataTemplate(() =>
         {
             var headerLabel = new Label();
-            headerLabel.Text =_localizationResourceManager.GetValue("check_internet");
+            headerLabel.Text = _localizationResourceManager.GetValue("check_internet");
             headerLabel.MaxLines = 2;
             headerLabel.FontFamily = "Arial";
             headerLabel.FontSize = 20;
@@ -490,7 +493,7 @@ public partial class MainPage : ContentPage
             FilteredItems.Add(item);
         }
 
-        if(FilteredItems.Count > 1)
+        if (FilteredItems.Count > 1)
             CreateListView();
         else
         {
@@ -512,7 +515,7 @@ public partial class MainPage : ContentPage
             });
 
             return;
-            
+
         }
 
 
@@ -527,7 +530,7 @@ public partial class MainPage : ContentPage
             CornerRadius = 10,
             BackgroundColor = Colors.Transparent,
             IsVisible = false,// Hide the Frame initially
-            Margin = new Thickness(0, 10, 0, 0)
+            Margin = new Thickness(0, 10, 0, 0),
         };
 
         // Create a ListView to display the filtered items
@@ -537,6 +540,8 @@ public partial class MainPage : ContentPage
             HorizontalScrollBarVisibility = ScrollBarVisibility.Default,
             MaximumHeightRequest = 200,
             MinimumHeightRequest = 200,
+            VerticalOptions = LayoutOptions.Start,
+            HorizontalOptions = LayoutOptions.Start,
 
         };
 
@@ -552,7 +557,7 @@ public partial class MainPage : ContentPage
 
             SelectedItem = item;
 
-            if(selectedItemLabel != null )
+            if (selectedItemLabel != null)
             {
                 InstallButtonEnable(true);
 
@@ -568,45 +573,16 @@ public partial class MainPage : ContentPage
 
         var dataTemplate = new DataTemplate(() =>
         {
-            // Create an Image object and bind its Source property to the ImageUrl property of the data model
-            var image = new Image();
-            image.MaximumWidthRequest = 35;
-            image.Margin = new Thickness(5,5,10,5);
-            image.SetBinding(Image.SourceProperty, "ImageUrl");
+            var image = CreateImage();
+            var label = CreateLabel();
+            var stackLayoutListItem = CreateStackLayout(image, label);
 
-            // Create a Label object and bind its Text property to the Name property of the data model
-            var label = new Label();
-            label.VerticalOptions = LayoutOptions.Center;
-            label.HorizontalOptions = LayoutOptions.Center;
-            label.TextColor = Colors.White;
-            label.Shadow = new Shadow
-            {
-                Brush = new SolidColorBrush(Colors.Black),
-                Opacity = 1f,
-                Offset = new Point(25, 25),
-                Radius =20
-            };
-            label.SetBinding(Label.TextProperty, "Name");
-
-            // Create a StackLayout object to arrange the image and label horizontally
-            var stackLayoutListItem = new StackLayout
-            {
-                Orientation = StackOrientation.Horizontal,
-                Children =
-                        {
-                            image,
-                            label
-                        },
-                HorizontalOptions = LayoutOptions.Center,
-                VerticalOptions = LayoutOptions.Center,
-                MinimumWidthRequest = 300
-            };
-
-            // Return a ViewCell object that contains the StackLayout
             return new ViewCell { View = stackLayoutListItem };
         });
-        
-       listView.ItemTemplate = dataTemplate;
+
+        listView.ItemTemplate = dataTemplate;
+
+
 
         // Show the ListView with the filtered items
 
@@ -615,20 +591,78 @@ public partial class MainPage : ContentPage
             SearchLoader.IsVisible = false;
             SearchListFrame.Content = listView;
             SearchListFrame.IsVisible = true;
+            SearchListFrame.VerticalOptions = LayoutOptions.Start;
+            SearchListFrame.HorizontalOptions = LayoutOptions.Start;
             SearchListFrameGrid.Add(SearchListFrame);
             return false;
         });
 
+    }
+
+    private Image CreateImage()
+    {
+        var image = new Image
+        {
+            MaximumWidthRequest = 35,
+            Margin = new Thickness(5, 5, 10, 5),
+            Aspect = Aspect.AspectFit,
+            HorizontalOptions = LayoutOptions.Start,
+            VerticalOptions = LayoutOptions.Start
+        };
+        image.SetBinding(Image.SourceProperty, "ImageUrl");
+
+        return image;
+    }
+
+    private Label CreateLabel()
+    {
+        var label = new Label
+        {
+            VerticalOptions = LayoutOptions.Center,
+            HorizontalOptions = LayoutOptions.Center,
+            TextColor = Colors.White,
+            Shadow = new Shadow
+            {
+                Brush = new SolidColorBrush(Colors.Black),
+                Opacity = 1f,
+                Offset = new Point(25, 25),
+                Radius = 20
+            },
+            LineBreakMode = LineBreakMode.TailTruncation,
+            MaximumWidthRequest = 200
+        };
+        label.SetBinding(Label.TextProperty, "Name");
+
+        return label;
+    }
+
+    private StackLayout CreateStackLayout(Image image, Label label)
+    {
+        return new StackLayout
+        {
+            Orientation = StackOrientation.Horizontal,
+            Children = { image, label },
+            HorizontalOptions = LayoutOptions.Start,
+            VerticalOptions = LayoutOptions.Start,
+            MinimumWidthRequest = 350
+        };
     }
     public void InstallButtonEnable(bool enable)
     {
         ButtonInstall.IsEnabled = enable;
         ButtonInstall.Opacity = enable ? 1 : 0.5;
     }
-    public void SearchBar_TextChanged(object sender, TextChangedEventArgs e){
+    public void SearchBar_TextChanged(object sender, TextChangedEventArgs e)
+    {
 
-        if(string.IsNullOrWhiteSpace(e.NewTextValue) && SearchListFrame != null){
+        if (string.IsNullOrWhiteSpace(e.NewTextValue) && SearchListFrame != null)
+        {
             SearchListFrame.IsVisible = false;
+            InstallButtonEnable(false);
+            SelectedItem = null;
+            selectedItemLabel.Text = string.Empty;
+
+
         }
     }
     private void langPicker_SelectedIndexChanged(object sender, EventArgs e)
@@ -639,9 +673,9 @@ public partial class MainPage : ContentPage
 
         this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
 
-        this.sponsorGameStackLayout.IsVisible = false ;
+        this.sponsorGameStackLayout.IsVisible = false;
         this.sponsorGameNotInternetorHuaweiService.IsVisible = false;
-        this.sponsorGameLoader.IsVisible = true ;
+        this.sponsorGameLoader.IsVisible = true;
 
         Init();
 
