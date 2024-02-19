@@ -116,15 +116,15 @@
 
                         <!-- Add the search bar and other elements as before -->
                         <SearchBar x:Name="searchBar"     
-                       FontAutoScalingEnabled="True" 
-                       PlaceholderColor="White"
-                       Placeholder="{loc:Translate search_games}" 
-                       SearchButtonPressed="SearchBarPressedAsync" 
-                       TextChanged="SearchBar_TextChanged" 
-                       MaxLength="50" 
-                       TextColor="WhiteSmoke"
+                               FontAutoScalingEnabled="True" 
+                               PlaceholderColor="White"
+                               Placeholder="{loc:Translate search_games}" 
+                               SearchButtonPressed="SearchBarPressedAsync" 
+                               TextChanged="SearchBar_TextChanged"
+                               MaxLength="50"
+                               TextColor="WhiteSmoke"
                                IsVisible="false"
-                       MaximumWidthRequest="500">
+                               MaximumWidthRequest="500">
                             <SearchBar.Shadow>
                                 <Shadow Brush="{StaticResource BlackBrush}" Offset="20,20" Radius="7" Opacity="0.5"/>
                             </SearchBar.Shadow>
@@ -140,8 +140,8 @@
                                    HeightRequest="250"
                                    WidthRequest="500"
                                    MaximumWidthRequest="750"
-                                   HorizontalOptions="CenterAndExpand"
-                                   VerticalOptions="CenterAndExpand">
+                                   HorizontalOptions="StartAndExpand"
+                                   VerticalOptions="StartAndExpand">
                                 <Grid>
 
                                     <StackLayout x:Name="sponsorGameNotInternetorHuaweiService" VerticalOptions="Center" HorizontalOptions="Center" IsVisible="false">
@@ -178,12 +178,15 @@
 
                                             <!--Define an image with a local source and aspect fit-->
                                             <Image x:Name="selectedGamePicture"
-                                             Margin="10,10,10,10"
+                                             Margin="10,10,10,0"
                                              Aspect="AspectFit"
                                              HorizontalOptions="Start"
                                              MaximumWidthRequest="100"
                                              MaximumHeightRequest="100"
-                                             Grid.RowSpan="2" 
+                                             Grid.Row="0" 
+                                             Grid.Column="0"
+                                             Grid.RowSpan="2"
+                                             Opacity="0.9"
                                            />
 
                                             <!--Define a label with some text and font attributes-->

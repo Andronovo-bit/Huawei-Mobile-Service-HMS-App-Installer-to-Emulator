@@ -4,6 +4,7 @@ using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Resources.Languages;
 using HuaweiHMSInstaller.Services;
+using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Maui.Core.Hosting;
@@ -67,11 +68,13 @@ public static class MauiProgram
         var services = builder.Services;
         builder.Services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(), "HuaweiHMSInstaller")); //configure value
         builder.Services.Configure<GlobalOptions>(x => x.VersionNumber = "0.0.1"); //configure value
-        builder.RegisterViews();
         services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
         services.AddScoped<IAppGalleryIntegration, AppGalleryIntegration>();
         services.AddScoped<IAppGalleryService, AppGalleryService>();
+        services.AddSingleton<INavigationService, NavigationService>();
+        builder.RegisterViews();
+
 
         return builder.Build();
     }
@@ -79,9 +82,14 @@ public static class MauiProgram
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
     {
         builder.Services.AddSingleton<AppShell>();
-        builder.Services.AddSingleton<MainPage>();
-        builder.Services.AddSingleton<DownloadandInstallPage>();
-        builder.Services.AddSingleton<ThanksPage>();
+        builder.Services.AddSingletonWithShellRoute<MainPage, MainViewModel>(nameof(MainPage));
+        builder.Services.AddSingletonWithShellRoute<DownloadandInstallPage, DownloadAndInstallPageViewModel>(nameof(DownloadandInstallPage));
+        builder.Services.AddSingletonWithShellRoute<ThanksPage, ThanksPageViewModel>(nameof(ThanksPage));
+
+        builder.Services.AddTransient<MainViewModel>();
+        builder.Services.AddTransient<DownloadAndInstallPageViewModel>();
+        builder.Services.AddTransient<ThanksPageViewModel>();
+
 
         return builder;
     }

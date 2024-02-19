@@ -9,15 +9,7 @@ namespace HuaweiHMSInstaller.Services
     static class ServiceProvider
     {
         static IServiceProvider Current =>
-#if WINDOWS
-			MauiWinUIApplication.Current.Services;
-#elif ANDROID
-                MauiApplication.Current.Services;
-#elif IOS || MACCATALYST
-			MauiUIApplicationDelegate.Current.Services;
-#else
-			throw new NotImplementedException();
-#endif
+                IPlatformApplication.Current?.Services ?? throw new InvalidOperationException("Service provider is not initialized");
 
         public static T GetService<T>() where T : notnull
             => Current.GetRequiredService<T>();
