@@ -1,5 +1,7 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Reflection;
+using CommunityToolkit.Maui;
 using HuaweiHMSInstaller.Integrations;
+using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Resources.Languages;
@@ -18,6 +20,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            // .UseAptabase("YOUR-CODE") // 👈 this is where you enter your App Key
             .UseMauiCommunityToolkit()
             .ConfigureSyncfusionCore()
             .UseLocalizationResourceManager(settings =>
@@ -25,16 +28,7 @@ public static class MauiProgram
                 settings.RestoreLatestCulture(true);
                 settings.AddResource(AppResources.ResourceManager);
             })
-            .ConfigureFonts(fonts =>
-            {
-                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");
-                fonts.AddFont("Roboto-Regular.ttf", "Roboto-Regular");
-                fonts.AddFont("FA-Brands-Regular-400.otf", "FontBrands");
-                fonts.AddFont("FA-Free-Regular-400.otf", "FontRegular");
-                fonts.AddFont("FA-Free-Solid-900.otf", "FontSolid");
-            });
+            .ConfigureFonts(ConfigureFonts);
 
         Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping(nameof(IWindow), (handler, view) =>
         {
@@ -65,18 +59,13 @@ public static class MauiProgram
 #if DEBUG
         builder.Logging.AddDebug();
 #endif
-        var services = builder.Services;
-        builder.Services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(), "HuaweiHMSInstaller")); //configure value
-        builder.Services.Configure<GlobalOptions>(x => x.VersionNumber = "0.0.1"); //configure value
-        services.AddHttpClient();
-        services.AddScoped<IAdbOperationService, AdbOperationService>();
-        services.AddScoped<IAppGalleryIntegration, AppGalleryIntegration>();
-        services.AddScoped<IAppGalleryService, AppGalleryService>();
-        services.AddSingleton<INavigationService, NavigationService>();
+        builder.Services.ConfigureServices();
+        // builder.Services.RegisterAnalyticsObservers(); // 👈 this is where we register the observers
         builder.RegisterViews();
 
-
-        return builder.Build();
+        var app = builder.Build();
+        // app.Services.ConfigureAnalyticsSubject(); // 👈 this is where we configure the subject
+        return app;
     }
 
     public static MauiAppBuilder RegisterViews(this MauiAppBuilder builder)
@@ -92,5 +81,49 @@ public static class MauiProgram
 
 
         return builder;
+    }
+    private static void ConfigureServices(this IServiceCollection services)
+    {
+        services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(), "HuaweiHMSInstaller")); //configure value
+        services.Configure<GlobalOptions>(x => x.VersionNumber = "0.0.1"); //configure value
+        services.AddHttpClient();
+        services.AddScoped<IAdbOperationService, AdbOperationService>();
+        services.AddScoped<IAppGalleryIntegration, AppGalleryIntegration>();
+        services.AddScoped<IAppGalleryService, AppGalleryService>();
+        services.AddSingleton<INavigationService, NavigationService>();
+        services.AddSingleton<AnalyticsSubject>();
+    }
+    private static void ConfigureAnalyticsSubject(this IServiceProvider serviceProvider)
+    {
+        // Use serviceProvider to get AnalyticsSubject and observers, then configure
+        var subject = serviceProvider.GetRequiredService<AnalyticsSubject>();
+        var observers = serviceProvider.GetServices<IAnalyticsObserver>();
+        foreach (var observer in observers)
+        {
+            subject.Attach(observer);
+        }
+    }
+    private static void ConfigureFonts(IFontCollection fonts)
+    {
+        // Centralizing font configuration allows for easier modifications and extensions
+        fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+        fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+        fonts.AddFont("Roboto-Medium.ttf", "Roboto-Medium");
+        fonts.AddFont("Roboto-Regular.ttf", "Roboto-Regular");
+        fonts.AddFont("FA-Brands-Regular-400.otf", "FontBrands");
+        fonts.AddFont("FA-Free-Regular-400.otf", "FontRegular");
+        fonts.AddFont("FA-Free-Solid-900.otf", "FontSolid");
+    }
+    private static void RegisterAnalyticsObservers(this IServiceCollection services)
+    {
+        // Use reflection to find all types that implement IAnalyticsObserver
+        // This allows adding new observers without modifying this code
+        var observerTypes = Assembly.GetExecutingAssembly().GetTypes()
+            .Where(t => typeof(IAnalyticsObserver).IsAssignableFrom(t) && !t.IsInterface);
+
+        foreach (var type in observerTypes)
+        {
+            services.AddSingleton(typeof(IAnalyticsObserver), type);
+        }
     }
 }
