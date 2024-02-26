@@ -8,6 +8,7 @@ using AdvancedSharpAdbClient.DeviceCommands;
 using AdvancedSharpAdbClient.Exceptions;
 using HuaweiHMSInstaller.Helper;
 using HuaweiHMSInstaller.Models;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using static AdvancedSharpAdbClient.DeviceCommands.PackageManager;
 
@@ -25,16 +26,16 @@ namespace HuaweiHMSInstaller.Services
         // Dependency injection to create HttpClient, AdbClient, Options instances
         private readonly IHttpClientFactory _httpClient;
         private AdbClient _adbClient;
-        private readonly GlobalOptions _options;
+        private readonly AppSettings _settings;
 
         public AdbOperationService(
-                            IHttpClientFactory httpClient, 
-                            IOptions<GlobalOptions> options)
+                            IHttpClientFactory httpClient,
+                            IConfiguration configuration)
         {
-            _options = options.Value;
+            _settings = configuration.GetSection("AppSettings").Get<AppSettings>();
             _httpClient = httpClient;
             NetworkChange.NetworkAvailabilityChanged += OnNetworkAvailabilityChanged;
-            adbPath = Path.Combine(_options.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
+            adbPath = Path.Combine(_settings.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
         }
         public async Task CreateAdbClient()
         {
@@ -85,19 +86,19 @@ namespace HuaweiHMSInstaller.Services
             string fileName = Path.GetFileName(AdbUrl);
 
             //if folder not exist create folder
-            Directory.CreateDirectory(_options.ProjectOperationPath);
+            Directory.CreateDirectory(_settings.ProjectOperationPath);
 
             // Create a file stream to store the downloaded data
-            using (var file = new FileStream(Path.Combine(_options.ProjectOperationPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+            using (var file = new FileStream(Path.Combine(_settings.ProjectOperationPath, fileName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
             {
                 // Download the file using the custom extension method
                 await _httpClient.DownloadAsync(AdbUrl, file, progress);
             }
 
             // Extract the file to the destination folder
-            ZipFile.ExtractToDirectory(Path.Combine(_options.ProjectOperationPath, fileName), Path.Combine(_options.ProjectOperationPath, AdbFolder),true);
+            ZipFile.ExtractToDirectory(Path.Combine(_settings.ProjectOperationPath, fileName), Path.Combine(_settings.ProjectOperationPath, AdbFolder),true);
             // Delete the file
-            File.Delete(Path.Combine(_options.ProjectOperationPath, fileName));
+            File.Delete(Path.Combine(_settings.ProjectOperationPath, fileName));
         }
         public async Task<List<DeviceData>> GetDevices()
         {
@@ -112,7 +113,7 @@ namespace HuaweiHMSInstaller.Services
             try
             {
                 // Create a file stream to store the downloaded data
-                using (var file = new FileStream(Path.Combine(_options.ProjectOperationPath, apkName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
+                using (var file = new FileStream(Path.Combine(_settings.ProjectOperationPath, apkName), FileMode.Create, FileAccess.Write, FileShare.None, 8192, true))
                 {
                     // Add try-catch block to handle NetworkErrorException
                     try

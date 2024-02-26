@@ -5,6 +5,7 @@ using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
 using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Text;
@@ -51,14 +52,17 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
 
     private readonly IAdbOperationService _adbOperationService;
     private readonly IAppGalleryService _appGalleryService;
-    private readonly GlobalOptions _options;
+    private readonly AppSettings _settings;
     private readonly ILocalizationResourceManager _localizationResourceManager;
-    private readonly IHttpClientFactory _httpClient;
     private readonly DownloadAndInstallPageViewModel _viewModel;
     private readonly AnalyticsSubject _analyticsSubject;
 
 
-    public DownloadandInstallPage(DownloadAndInstallPageViewModel viewModel, AnalyticsSubject analyticsSubject)
+
+    public DownloadandInstallPage(
+        DownloadAndInstallPageViewModel viewModel,
+        AnalyticsSubject analyticsSubject,
+        IConfiguration configuration)
     {
         Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
 
@@ -66,8 +70,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
         _adbOperationService = ServiceProvider.GetService<IAdbOperationService>();
         _appGalleryService = ServiceProvider.GetService<IAppGalleryService>();
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
-        _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
-        _httpClient = ServiceProvider.GetService<IHttpClientFactory>();
+        _settings = configuration.GetSection("Settings").Get<AppSettings>();
         _analyticsSubject = analyticsSubject;
         _viewModel = viewModel;
         this.NavigatedTo += (s, e) => Initialize();
@@ -208,7 +211,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
         this.timerReconnect.IsVisible = false;
         var totalApp = AdbProgressMessages.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.Count; //7   
 
-        var files = Directory.GetFiles(_options.ProjectOperationPath);
+        var files = Directory.GetFiles(_settings.ProjectOperationPath);
 
         foreach (var record in apkRecords)
         {
@@ -386,7 +389,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
     ///TODO If lost internet connection when download apk, try again connecting it automaticaLly one time but can't connect show an error popup.
     private async ValueTask<bool> DownloadHMSAppsAsync()
     {
-        Directory.CreateDirectory(_options.ProjectOperationPath);
+        Directory.CreateDirectory(_settings.ProjectOperationPath);
         apkRecords = new List<InstallApkModel>
         {
             new($"{nameof(HmsCore)}.apk", HmsCore, AdbMessagesConst.DownloadingHMSCore),
@@ -432,7 +435,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
     }
     private async Task CheckApkFileSizeAsync(InstallApkModel model)
     {
-        var filePath = Path.Combine(_options.ProjectOperationPath, model.Name);
+        var filePath = Path.Combine(_settings.ProjectOperationPath, model.Name);
         var exist = File.Exists(filePath);
         if (exist)
         {
@@ -451,7 +454,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
     }
     private void CheckApkFileExist(InstallApkModel model)
     {
-        var filePath = Path.Combine(_options.ProjectOperationPath, model.Name);
+        var filePath = Path.Combine(_settings.ProjectOperationPath, model.Name);
         var exist = File.Exists(filePath);
         if (exist)
         {
@@ -510,7 +513,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
                 UpdateHMSInfoLabel();
             };
             //var p = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), apkPaths[i]);
-            apkPaths[i] = Path.Combine(_options.ProjectOperationPath, apkPaths[i]);
+            apkPaths[i] = Path.Combine(_settings.ProjectOperationPath, apkPaths[i]);
             await InstallApkToDeviceAsync(apkPaths[i], progressHMSApps, device);
         }
 

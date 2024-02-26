@@ -8,6 +8,7 @@ using HuaweiHMSInstaller.Resources.Languages;
 using HuaweiHMSInstaller.Services;
 using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Syncfusion.Maui.Core.Hosting;
 
@@ -62,6 +63,7 @@ public static class MauiProgram
         builder.Services.ConfigureServices();
         // builder.Services.RegisterAnalyticsObservers(); // 👈 this is where we register the observers
         builder.RegisterViews();
+        builder.RegisterConfiguration();
 
         var app = builder.Build();
         // app.Services.ConfigureAnalyticsSubject(); // 👈 this is where we configure the subject
@@ -124,6 +126,29 @@ public static class MauiProgram
         foreach (var type in observerTypes)
         {
             services.AddSingleton(typeof(IAnalyticsObserver), type);
+        }
+    }
+    private static void RegisterConfiguration(this MauiAppBuilder appBuilder)
+    {
+        const string resourceName = "HuaweiHMSInstaller.appsettings.json";
+
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream(resourceName);
+
+        if (stream != null)
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonStream(stream)
+                .Build();
+
+            configuration["Settings:ProjectOperationPath"] = Path.Combine(Path.GetTempPath(), "HuaweiHMSInstaller"); //add data to configuration
+
+            appBuilder.Configuration.AddConfiguration(configuration);
+
+        }
+        else
+        {
+            throw new FileNotFoundException($"Resource {resourceName} not found.");
         }
     }
 }

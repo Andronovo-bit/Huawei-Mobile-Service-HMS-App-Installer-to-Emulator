@@ -3,7 +3,6 @@ using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
-using System.Text;
 
 namespace HuaweiHMSInstaller.ViewModels
 {
@@ -11,7 +10,6 @@ namespace HuaweiHMSInstaller.ViewModels
     {
         private readonly AnalyticsSubject _analyticsSubject;
         private readonly IAppGalleryService _appGalleryService;
-
         public SearchListItem SearchListItem { get; set; }
         public Worker<bool>.WorkCompletedEventHandler AfterEventInternetAndHuaweiServiceCheck { get; set; }
 

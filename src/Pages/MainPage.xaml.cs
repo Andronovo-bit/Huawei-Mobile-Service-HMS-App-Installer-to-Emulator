@@ -5,6 +5,7 @@ using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
 using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.Maui.Controls.Shapes;
 using Syncfusion.Maui.Popup;
@@ -23,7 +24,7 @@ public partial class MainPage : ContentPage
     private SearchListItem SelectedItem { get; set; }
     private Frame SearchListFrame;
     private readonly ILocalizationResourceManager _localizationResourceManager;
-    private readonly GlobalOptions _options;
+    private readonly AppSettings _settings;
     private readonly MainViewModel _mainViewModel;
     private readonly AnalyticsSubject _analyticsSubject;
 
@@ -33,14 +34,14 @@ public partial class MainPage : ContentPage
             IAppGalleryService appGalleryService,
             ILocalizationResourceManager localizationResourceManager,
             AnalyticsSubject analyticsSubject,
-            IOptions<GlobalOptions> options)
+            IConfiguration configuration)
     {
         Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
 
         InitializeComponent();
         _appGalleryService = appGalleryService;
         _localizationResourceManager = localizationResourceManager;
-        _options = options.Value;
+        _settings = configuration.GetSection("Settings").Get<AppSettings>();
         _mainViewModel = mainViewModel;
         _analyticsSubject = analyticsSubject;
         Init();
@@ -50,7 +51,7 @@ public partial class MainPage : ContentPage
         this.langPicker.SelectedItem = _localizationResourceManager.CurrentCulture.TwoLetterISOLanguageName.ToUpper();
         this.searchBar.BackgroundColor = Color.FromRgba(255, 255, 255, 0.1);
         this.SearchListFrameGrid.BackgroundColor = Color.FromRgba(255, 255, 255, 0.05);
-        this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
+        this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_settings.VersionNumber}";
 
         _mainViewModel.Init(CheckInternetConnectionAction);
         _mainViewModel.AfterEventInternetAndHuaweiServiceCheck = AfterEventInternetAndHuaweiServiceCheck;
@@ -134,7 +135,7 @@ public partial class MainPage : ContentPage
 
     private async Task GetSponsorGameInfo()
     {
-        var gameAppId = _options.SponsorGameAppId;
+        var gameAppId = _settings.SponsorGameAppId;
         if (gameAppId != null)
         {
             this.selectedGameFrame.IsVisible = true;
@@ -663,7 +664,7 @@ public partial class MainPage : ContentPage
 
         _localizationResourceManager.CurrentCulture = new CultureInfo(picker.SelectedItem.ToString());
 
-        this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
+        this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_settings.VersionNumber}";
 
         this.sponsorGameStackLayout.IsVisible = false;
         this.sponsorGameNotInternetorHuaweiService.IsVisible = false;
