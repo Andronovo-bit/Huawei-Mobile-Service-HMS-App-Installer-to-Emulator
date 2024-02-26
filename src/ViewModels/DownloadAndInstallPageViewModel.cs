@@ -5,6 +5,7 @@ using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
 using System.Text;
@@ -14,7 +15,7 @@ namespace HuaweiHMSInstaller.ViewModels
     public sealed partial class DownloadAndInstallPageViewModel : BaseViewModel, IQueryAttributable
     {
         private readonly IAdbOperationService _adbOperationService;
-        private readonly GlobalOptions _options;
+        private readonly AppSettings _settings;
         private readonly AnalyticsSubject _analyticsSubject;
         private readonly IHttpClientFactory _httpClient;
 
@@ -40,14 +41,14 @@ namespace HuaweiHMSInstaller.ViewModels
         public DownloadAndInstallPageViewModel(
                 INavigationService navigationService, 
                 IAdbOperationService adbOperationService,
-                IOptions<GlobalOptions> options,
                 AnalyticsSubject analyticsSubject,
-                IHttpClientFactory httpClient)
+                IHttpClientFactory httpClient,
+                IConfiguration configuration)
             : base(navigationService)
         {
             Debug.WriteLine($"**** {this.GetType().Name}.{nameof(DownloadAndInstallPageViewModel)}:  ctor");
             _adbOperationService = adbOperationService;
-            _options = options.Value;
+            _settings = configuration.GetSection("Settings").Get<AppSettings>();
             _httpClient = httpClient;
             _analyticsSubject = analyticsSubject;
             _analyticsSubject.Notify("Download and Install Page Loaded");
@@ -71,8 +72,8 @@ namespace HuaweiHMSInstaller.ViewModels
         private void Init()
         {
             AdbProgressMessages = AdbMessagesConst.InitializeMessages();
-            adbPath = Path.Combine(_options.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
-            adbFolderPath = Path.Combine(_options.ProjectOperationPath, AdbFolder);
+            adbPath = Path.Combine(_settings.ProjectOperationPath, AdbFolder, "platform-tools", "adb.exe");
+            adbFolderPath = Path.Combine(_settings.ProjectOperationPath, AdbFolder);
         }
 
         public async void NavigateToThanksPage()
