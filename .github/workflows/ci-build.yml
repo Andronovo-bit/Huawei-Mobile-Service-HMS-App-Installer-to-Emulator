@@ -47,16 +47,16 @@ jobs:
         run: dotnet workload install maui --ignore-failed-sources
 
       - name: Restore Dependencies
-        run: dotnet restore HuaweiHMSInstaller.sln /p:TargetFramework=net8.0-windows10.0.19041.0 /p:configuration=release /p:PublishReadyToRun=true
+        run: dotnet restore HuaweiHMSInstaller.sln /p:TargetFramework=net8.0-windows10.0.19041.0 /p:configuration=release 
         
       - name: Build
-        run: dotnet build src/HuaweiHMSInstaller.csproj /p:TargetFramework=net8.0-windows10.0.19041.0 /p:configuration=release /p:PublishReadyToRun=true --no-restore
+        run: dotnet build src/HuaweiHMSInstaller.csproj /p:TargetFramework=net8.0-windows10.0.19041.0 /p:configuration=release --no-restore
 
       - name: Publish for Windows
-        run: dotnet publish src/HuaweiHMSInstaller.csproj /p:TargetFramework=net8.0-windows10.0.19041.0 /p:configuration=release /p:PublishReadyToRun=true --no-self-contained -c Release -o ./publish/windows
+        run: dotnet publish src/HuaweiHMSInstaller.csproj /p:TargetFramework=net8.0-windows10.0.19041.0 /p:WindowsPackageType=MSIX -c Release -o ./publish/windows
 
       - name: Upload Windows Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app
-          path: ./publish/windows/**
+          name: windows-app-installer
+          path: ./src/bin/Release/net8.0-windows10.0.19041.0/win10-x64/AppPackages/HuaweiHMSInstaller_0.0.1.0_Test/**

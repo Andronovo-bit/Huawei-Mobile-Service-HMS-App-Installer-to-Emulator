@@ -21,6 +21,7 @@
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
 		<WinUISingleInstance>true</WinUISingleInstance>
+    	<EnableMsixTooling>true</EnableMsixTooling>
 
 		<!-- Display name -->
 		<ApplicationTitle>HuaweiHMSInstaller</ApplicationTitle>
