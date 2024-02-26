@@ -101,12 +101,10 @@ namespace HuaweiHMSInstaller.Services
         }
         public async Task<List<DeviceData>> GetDevices()
         {
+            await GetDevicesDefaultAsync();
             var devices = await _adbClient.GetDevicesAsync();
-            if (devices.Count == 0)
-            {
-                var defaultDevice = await GetDevicesDefaultAsync();
-                if(defaultDevice) devices = await _adbClient.GetDevicesAsync();
-            }
+            devices = devices.Where(t => t.State == DeviceState.Online).ToList();
+
             return devices;
         }
         public async Task DownloadApkFromInternetAsync(string apkUrl, string apkName, IProgress<float> progress = null, CancellationToken cancellationToken = default)
@@ -187,10 +185,16 @@ namespace HuaweiHMSInstaller.Services
                         continue;
                     }
 
-                    if(ex.Message.Contains("INSTALL_FAILED_UPDATE_INCOMPATIBLE"))
+                    if (ex.Message.Contains("INSTALL_FAILED_UPDATE_INCOMPATIBLE"))
                     {
                         //TODO : Find uninstall package name using adb command
                         manager.UninstallPackage("com.huawei.hwid");
+                    }
+
+                    if (ex.Message.Contains("INSTALL_FAILED_VERSION_DOWNGRADE"))
+                    {
+                        installed = true;
+                        continue;
                     }
 
                     // Catch any exceptions that occur during installation and restart the ADB server.

@@ -2,7 +2,7 @@
 
 namespace HuaweiHMSInstaller.Services
 {
-    internal interface IAppGalleryService
+    public interface IAppGalleryService
     {
         Task<AppGalleryAdvancedSearchResult> SearchAppGalleryApp(string keyword);
         Task<AppGalleryAppDetailResult> GetAppDetail(string appId);
