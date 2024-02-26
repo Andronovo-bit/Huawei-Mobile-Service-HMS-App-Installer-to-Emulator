@@ -1,4 +1,5 @@
 using HuaweiHMSInstaller.Helper;
+using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.ViewModels;
 using LocalizationResourceManager.Maui;
 using Syncfusion.Maui.Popup;
@@ -11,16 +12,20 @@ public partial class ThanksPage : ContentPage
     private SfPopup _sfPopup;
     private readonly ILocalizationResourceManager _localizationResourceManager;
     private readonly ThanksPageViewModel _viewModel;
+    private readonly AnalyticsSubject _analyticsSubject;
 
-    public ThanksPage(ThanksPageViewModel viewModel)
+    public ThanksPage(ThanksPageViewModel viewModel, AnalyticsSubject analyticsSubject)
 	{
         InitializeComponent();
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
         _viewModel = viewModel;
         BindingContext = _viewModel;
+        _analyticsSubject = analyticsSubject;
+        _analyticsSubject.Notify("Thanks Page Loaded");
     }
     private void OnFinishButtonClicked(object sender, EventArgs e)
     {
+        _analyticsSubject.Notify("Thanks Page Finish Button Clicked");
         //Create popup and push it to the navigation stack
         //Initialize the popup
         var popup = new SfPopup();
@@ -89,7 +94,8 @@ public partial class ThanksPage : ContentPage
 
     private async void ButtonBack_Clicked(object sender, EventArgs e)
     {
-        _viewModel.NavigateToMainPage();
+        await _analyticsSubject.NotifyAsync("Thanks Page Back Button Clicked");
+        await _viewModel.NavigateToMainPage();
     }
 }
 

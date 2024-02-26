@@ -1,5 +1,6 @@
 using AdvancedSharpAdbClient;
 using HuaweiHMSInstaller.Helper;
+using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Services;
 using HuaweiHMSInstaller.ViewModels;
@@ -54,8 +55,10 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
     private readonly ILocalizationResourceManager _localizationResourceManager;
     private readonly IHttpClientFactory _httpClient;
     private readonly DownloadAndInstallPageViewModel _viewModel;
+    private readonly AnalyticsSubject _analyticsSubject;
 
-    public DownloadandInstallPage(DownloadAndInstallPageViewModel viewModel)
+
+    public DownloadandInstallPage(DownloadAndInstallPageViewModel viewModel, AnalyticsSubject analyticsSubject)
     {
         Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
 
@@ -65,6 +68,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
         _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
         _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
         _httpClient = ServiceProvider.GetService<IHttpClientFactory>();
+        _analyticsSubject = analyticsSubject;
         _viewModel = viewModel;
         this.NavigatedTo += (s, e) => Initialize();
 
@@ -78,7 +82,6 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
         }
         OnPropertyChanged(nameof(SearchListItem));
     }
-
     private void Initialize()
     {
         // Assign the game item
@@ -137,11 +140,15 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
             var checkHuaweiService = await _appGalleryService.CheckAppGalleryCloudServiceAsync();
             if (checkInternet && checkHuaweiService)
             {
-                await DownloadandInstallHmsAppsAndNavigateAsync(adbDevices.First());
+                foreach (var device in adbDevices)
+                {
+                    await DownloadandInstallHmsAppsAndNavigateAsync(device);
+                }
             }
             else
             {
                 var msg = checkInternet && !checkHuaweiService ? _localizationResourceManager.GetValue("huawei_server_unreachable") : _localizationResourceManager.GetValue("internet_connection_error");
+                await _analyticsSubject.NotifyAsync(msg);
                 await AlertForNotHaveInternetAsync(msg);
             }
         }
@@ -279,21 +286,11 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
     {
         // Update the message
         // Update the comment label text based on the current progress and message index
-        var adbProgressMsg = AdbProgressMessages.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
-        if (adbProgressMsg.Count > currentThresholdIndex)
+        var commentString = _viewModel.UpdateCommentLabel(AdbProgressMessages, currentThresholdIndex, GameName);
+        Dispatcher.Dispatch(delegate
         {
-            commentBuilder.Clear();
-            var value = adbProgressMsg[currentThresholdIndex];
-            if (value == AdbMessagesConst.DownloadingGame || value == AdbMessagesConst.InstallingGame)
-            {
-                value += ": " + GameName;
-            }
-            commentBuilder.Append(value);
-            Dispatcher.Dispatch(delegate
-            {
-                this.commentLabel.Text = commentBuilder.ToString();
-            });
-        }
+            this.commentLabel.Text = commentString;
+        });
     }
     private void UpdateHMSInfoLabel()
     {
@@ -320,15 +317,10 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
             }
         });
     }
-    private async ValueTask<bool> CheckFileSize(FileInfo fileInfo, string url)
-    {
-        long fileSize = fileInfo.Length;
-        var downloadFileSize = await HttpClientExtensions.GetFileSizeAsync(_httpClient, url);
-        return fileSize == downloadFileSize;
-    }
     private async Task AlertForNotHaveAdbDevices()
     {
         await Task.Delay(1000);
+        await _analyticsSubject.NotifyAsync("No Adb Devices");
         var errorLanguage = _localizationResourceManager.GetValue("error");
         var emulatorConnectLanguage = _localizationResourceManager.GetValue("emulator_try_again_connect");
         var cancelLanguage = _localizationResourceManager.GetValue("cancel");
@@ -445,7 +437,7 @@ public partial class DownloadandInstallPage : ContentPage, IQueryAttributable
         if (exist)
         {
             FileInfo fileInfo = new(filePath);
-            var checkFileSize = await CheckFileSize(fileInfo, model.DownloadUrl);
+            var checkFileSize = await _viewModel.CheckFileSize(fileInfo, model.DownloadUrl);
             if (checkFileSize)
             {
                 model.IsDownloaded = true;

@@ -1,4 +1,5 @@
 using HuaweiHMSInstaller.Helper;
+using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
@@ -10,7 +11,6 @@ using Syncfusion.Maui.Popup;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using Path = Microsoft.Maui.Controls.Shapes.Path;
-using ServiceProvider = HuaweiHMSInstaller.Services.ServiceProvider;
 
 namespace HuaweiHMSInstaller;
 public partial class MainPage : ContentPage
@@ -19,21 +19,30 @@ public partial class MainPage : ContentPage
     private Button footerButton = new();
     private readonly IAppGalleryService _appGalleryService;
     private ObservableCollection<SearchListItem> FilteredItems = new();
-
+    private delegate void WorkerCompletedEventHandler();
     private SearchListItem SelectedItem { get; set; }
     private Frame SearchListFrame;
     private readonly ILocalizationResourceManager _localizationResourceManager;
     private readonly GlobalOptions _options;
     private readonly MainViewModel _mainViewModel;
-    public MainPage(MainViewModel mainViewModel)
+    private readonly AnalyticsSubject _analyticsSubject;
+
+
+    public MainPage(
+            MainViewModel mainViewModel,
+            IAppGalleryService appGalleryService,
+            ILocalizationResourceManager localizationResourceManager,
+            AnalyticsSubject analyticsSubject,
+            IOptions<GlobalOptions> options)
     {
         Connectivity.ConnectivityChanged += Connectivity_ConnectivityChanged;
 
         InitializeComponent();
-        _appGalleryService = ServiceProvider.GetService<IAppGalleryService>();
-        _localizationResourceManager = ServiceProvider.GetService<ILocalizationResourceManager>();
-        _options = ServiceProvider.GetService<IOptions<GlobalOptions>>().Value;
+        _appGalleryService = appGalleryService;
+        _localizationResourceManager = localizationResourceManager;
+        _options = options.Value;
         _mainViewModel = mainViewModel;
+        _analyticsSubject = analyticsSubject;
         Init();
     }
     private void Init()
@@ -43,47 +52,19 @@ public partial class MainPage : ContentPage
         this.SearchListFrameGrid.BackgroundColor = Color.FromRgba(255, 255, 255, 0.05);
         this.VersionNum.Text = $"{_localizationResourceManager.GetValue("version")}: {_options.VersionNumber}";
 
-        _ = CheckInternetAndAppGalleryService(AfterEventInternetAndHuaweiServiceCheck);
+        _mainViewModel.Init(CheckInternetConnectionAction);
+        _mainViewModel.AfterEventInternetAndHuaweiServiceCheck = AfterEventInternetAndHuaweiServiceCheck;
     }
     #region Internet&Huawei server check operation
-    private bool CheckNetworkConnectionInit()
+    private void CheckInternetConnectionAction() => Dispatcher.StartTimer(TimeSpan.FromSeconds(2), HasNoInternetConnection);
+    private bool HasNoInternetConnection()
     {
-
-        var current = Connectivity.NetworkAccess;
-        if (current == NetworkAccess.Internet) return true;
-
+        this.sponsorGameLoader.IsVisible = false;
+        this.sponsorGameNotInternetorHuaweiService.IsVisible = true;
+        this.sponsorGameNotInternetorHuaweiServiceLabel.Text = _localizationResourceManager.GetValue("internet_connection_error");
+        this.sponsorGameStackLayout.IsVisible = false;
+        InstallButtonEnable(false);
         return false;
-    }
-    private void CheckHuaweiService(Worker<bool>.WorkCompletedEventHandler func) =>
-        CheckService(func, _appGalleryService.CheckAppGalleryServiceAsync);
-    private void CheckHuaweiCloudService(Worker<bool>.WorkCompletedEventHandler func) =>
-        CheckService(func, _appGalleryService.CheckAppGalleryCloudServiceAsync);
-    private void CheckService(Worker<bool>.WorkCompletedEventHandler func, Func<Task<bool>> check)
-    {
-        var worker = new Worker<bool>();
-        worker.WorkCompleted += func;
-        _ = worker.DoWorkAsync(async () => await check());
-    }
-    private async Task CheckInternetAndAppGalleryService(Worker<bool>.WorkCompletedEventHandler func)
-    {
-        var networkState = CheckNetworkConnectionInit();
-        var internetState = await NetworkUtils.CheckForInternetConnectionAsync();
-        if (networkState && internetState)
-        {
-            CheckHuaweiService(func);
-        }
-        else
-        {
-            Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
-            {
-                this.sponsorGameLoader.IsVisible = false;
-                this.sponsorGameNotInternetorHuaweiService.IsVisible = true;
-                this.sponsorGameNotInternetorHuaweiServiceLabel.Text = _localizationResourceManager.GetValue("internet_connection_error");
-                this.sponsorGameStackLayout.IsVisible = false;
-                InstallButtonEnable(false);
-                return false;
-            });
-        }
     }
     private void AfterEventInternetAndHuaweiServiceCheck(object sender, bool result)
     {
@@ -98,7 +79,7 @@ public partial class MainPage : ContentPage
         }
         else
         {
-            CheckHuaweiService(SposorGameCheck);
+            _mainViewModel.CheckHuaweiService(SposorGameCheck);
         }
     }
     private void Connectivity_ConnectivityChanged(object sender, ConnectivityChangedEventArgs e)
@@ -180,6 +161,14 @@ public partial class MainPage : ContentPage
             this.sponsorGameLoader.IsVisible = false;
             this.sponsorGameStackLayout.IsVisible = true;
             SelectedItem = selectedGame;
+            await _analyticsSubject.NotifyAsync("Main Page Loaded",
+                new Dictionary<string, object>
+                {
+                    { "SelectedGame", selectedGame.Name },
+                    { "SelectedGameId", selectedGame.AppId }
+                }
+            );
+
             InstallButtonEnable(true);
         }
     }
@@ -267,6 +256,7 @@ public partial class MainPage : ContentPage
 
         void NotInternetAndHuweiServiceState(string langKey)
         {
+            _analyticsSubject.Notify("Unable to connect to the internet or Huawei service");
             label.FontSize = 19;
             label.Margin = new Thickness(0, 0, 0, 10);
             label.Text = _localizationResourceManager.GetValue(langKey);
@@ -296,7 +286,7 @@ public partial class MainPage : ContentPage
 
         if (resultCheckingInternetConnection)
         {
-            CheckHuaweiCloudService(CheckHuaweiCloudServicekCallBack);
+            _mainViewModel.CheckHuaweiCloudService(CheckHuaweiCloudServicekCallBack);
         }
         else
         {
@@ -477,6 +467,13 @@ public partial class MainPage : ContentPage
 
         SearchLoader.IsVisible = true;
 
+        await _analyticsSubject.NotifyAsync("Search Bar Pressed",
+            new Dictionary<string, object>
+            {
+                { "SearchQuery", query }
+            }
+        );
+
         var searchResult = await _appGalleryService.SearchAppGalleryApp(query);
 
         var items = searchResult.layoutData.SelectMany(t => t.dataList.Select(x =>
@@ -598,7 +595,6 @@ public partial class MainPage : ContentPage
         });
 
     }
-
     private Image CreateImage()
     {
         var image = new Image
@@ -613,7 +609,6 @@ public partial class MainPage : ContentPage
 
         return image;
     }
-
     private Label CreateLabel()
     {
         var label = new Label
@@ -635,7 +630,6 @@ public partial class MainPage : ContentPage
 
         return label;
     }
-
     private StackLayout CreateStackLayout(Image image, Label label)
     {
         return new StackLayout
@@ -661,8 +655,6 @@ public partial class MainPage : ContentPage
             InstallButtonEnable(false);
             SelectedItem = null;
             selectedItemLabel.Text = string.Empty;
-
-
         }
     }
     private void langPicker_SelectedIndexChanged(object sender, EventArgs e)
@@ -685,6 +677,7 @@ public partial class MainPage : ContentPage
         this.selectedGameFrame.IsVisible = false;
         this.searchBar.IsVisible = true;
         InstallButtonEnable(false);
+        _analyticsSubject.Notify("Change Game Button Clicked");
     }
 }
 

@@ -1,12 +1,15 @@
-﻿using HuaweiHMSInstaller.Services;
+﻿using HuaweiHMSInstaller.Integrations.Analytics;
+using HuaweiHMSInstaller.Services;
 
 namespace HuaweiHMSInstaller.ViewModels
 {
     public class ThanksPageViewModel : BaseViewModel
     {
+
         public ThanksPageViewModel(INavigationService navigationService) 
             : base(navigationService)
         {
+            
         }
 
         //public async void NavigateToSettingsPage()

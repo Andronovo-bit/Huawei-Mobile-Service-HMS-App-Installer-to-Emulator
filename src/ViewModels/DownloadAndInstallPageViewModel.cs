@@ -1,11 +1,13 @@
 ﻿using AdvancedSharpAdbClient;
 using CommunityToolkit.Mvvm.ComponentModel;
 using HuaweiHMSInstaller.Helper;
+using HuaweiHMSInstaller.Integrations.Analytics;
 using HuaweiHMSInstaller.Models;
 using HuaweiHMSInstaller.Pages;
 using HuaweiHMSInstaller.Services;
 using Microsoft.Extensions.Options;
 using System.Diagnostics;
+using System.Text;
 
 namespace HuaweiHMSInstaller.ViewModels
 {
@@ -13,6 +15,9 @@ namespace HuaweiHMSInstaller.ViewModels
     {
         private readonly IAdbOperationService _adbOperationService;
         private readonly GlobalOptions _options;
+        private readonly AnalyticsSubject _analyticsSubject;
+        private readonly IHttpClientFactory _httpClient;
+
 
         public SearchListItem SearchListItem { get; set; }
 
@@ -32,12 +37,20 @@ namespace HuaweiHMSInstaller.ViewModels
         public Action<float> OnProgressChanged;
         public Action OnThresholdReached;
 
-        public DownloadAndInstallPageViewModel(INavigationService navigationService, IAdbOperationService adbOperationService, IOptions<GlobalOptions> options)
+        public DownloadAndInstallPageViewModel(
+                INavigationService navigationService, 
+                IAdbOperationService adbOperationService,
+                IOptions<GlobalOptions> options,
+                AnalyticsSubject analyticsSubject,
+                IHttpClientFactory httpClient)
             : base(navigationService)
         {
             Debug.WriteLine($"**** {this.GetType().Name}.{nameof(DownloadAndInstallPageViewModel)}:  ctor");
             _adbOperationService = adbOperationService;
             _options = options.Value;
+            _httpClient = httpClient;
+            _analyticsSubject = analyticsSubject;
+            _analyticsSubject.Notify("Download and Install Page Loaded");
             Init();
         }
 
@@ -156,6 +169,33 @@ namespace HuaweiHMSInstaller.ViewModels
             AdbProgressMessages[AdbMessagesConst.DownloadingADBDriver] = false;
             AdbProgressMessages[AdbMessagesConst.InstallingADBDriver] = false;
             OnThresholdReached?.Invoke();
+        }
+
+        public async ValueTask<bool> CheckFileSize(FileInfo fileInfo, string url)
+        {
+            long fileSize = fileInfo.Length;
+            var downloadFileSize = await HttpClientExtensions.GetFileSizeAsync(_httpClient, url);
+            return fileSize == downloadFileSize;
+        }
+
+        public string UpdateCommentLabel(Dictionary<string, bool> adbProgressMessages, int currentThresholdIndex, string gameName)
+        {
+            StringBuilder commentBuilder = new StringBuilder();
+            // Update the message
+            // Update the comment label text based on the current progress and message index
+            var adbProgressMsg = adbProgressMessages.Where(x => x.Value).ToDictionary(x => x.Key, x => x.Value).Keys.ToList();
+            if (adbProgressMsg.Count > currentThresholdIndex)
+            {
+                commentBuilder.Clear();
+                var value = adbProgressMsg[currentThresholdIndex];
+                if (value == AdbMessagesConst.DownloadingGame || value == AdbMessagesConst.InstallingGame)
+                {
+                    value += ": " + gameName;
+                }
+                commentBuilder.Append(value);
+            }
+
+            return commentBuilder.ToString();
         }
     }
 }
