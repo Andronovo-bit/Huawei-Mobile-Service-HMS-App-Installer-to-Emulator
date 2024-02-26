@@ -33,23 +33,16 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x.x
-
-      - name: Cache .NET packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-dotnet-${{ hashFiles('**/*.csproj', '**/*.sln') }}
-          restore-keys: |
-            ${{ runner.os }}-dotnet-
-
-      - name: Cache MAUI Workload
-        uses: actions/cache@v3
-        with:
-          path: ~/.dotnet/sdk-manifests/8.0.100/maui
-          key: ${{ runner.os }}-maui-${{ hashFiles('**/*.csproj', '**/*.sln') }}
-          restore-keys: |
-            ${{ runner.os }}-maui-
-
+      - name: Update appsettings.json
+        run: |
+          $pathToJson = "./src/appsettings.json"
+          $jsonContent = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
+          $jsonContent.Settings.SponsorGameAppId = "${{ vars.GAME_ID }}"
+          $jsonContent.Settings.YoutuberChanneName = "${{ vars.YOUTUBE_CHANNEL }}"
+          $jsonContent | ConvertTo-Json -Depth 100 | Set-Content -Path $pathToJson
+          $jsonContent
+        shell: pwsh
+      
       - name: Install MAUI Workload
         run: dotnet workload install maui --ignore-failed-sources
 
