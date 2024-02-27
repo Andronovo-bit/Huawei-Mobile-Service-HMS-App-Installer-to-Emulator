@@ -166,7 +166,8 @@ public partial class MainPage : ContentPage
                 new Dictionary<string, object>
                 {
                     { "SelectedGame", selectedGame.Name },
-                    { "SelectedGameId", selectedGame.AppId }
+                    { "SelectedGameId", selectedGame.AppId },
+                    { "YoutuberChannel", _settings.YoutuberChanneName }
                 }
             );
 

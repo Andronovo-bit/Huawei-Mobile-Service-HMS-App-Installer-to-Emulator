@@ -21,7 +21,6 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            // .UseAptabase("YOUR-CODE") // 👈 this is where you enter your App Key
             .UseMauiCommunityToolkit()
             .ConfigureSyncfusionCore()
             .UseLocalizationResourceManager(settings =>
@@ -30,6 +29,9 @@ public static class MauiProgram
                 settings.AddResource(AppResources.ResourceManager);
             })
             .ConfigureFonts(ConfigureFonts);
+
+        builder.Logging.SetMinimumLevel(LogLevel.Debug);
+
 
         Microsoft.Maui.Handlers.WindowHandler.Mapper.AppendToMapping(nameof(IWindow), (handler, view) =>
         {
@@ -61,12 +63,12 @@ public static class MauiProgram
         builder.Logging.AddDebug();
 #endif
         builder.Services.ConfigureServices();
-        // builder.Services.RegisterAnalyticsObservers(); // 👈 this is where we register the observers
         builder.RegisterViews();
         builder.RegisterConfiguration();
+        builder.CheckAndAddAnalyticsBeforeBuild();
 
         var app = builder.Build();
-        // app.Services.ConfigureAnalyticsSubject(); // 👈 this is where we configure the subject
+        app.CheckAndAddAnalyticsAfterBuild();
         return app;
     }
 
@@ -86,8 +88,6 @@ public static class MauiProgram
     }
     private static void ConfigureServices(this IServiceCollection services)
     {
-        services.Configure<GlobalOptions>(x => x.ProjectOperationPath = Path.Combine(Path.GetTempPath(), "HuaweiHMSInstaller")); //configure value
-        services.Configure<GlobalOptions>(x => x.VersionNumber = "0.0.1"); //configure value
         services.AddHttpClient();
         services.AddScoped<IAdbOperationService, AdbOperationService>();
         services.AddScoped<IAppGalleryIntegration, AppGalleryIntegration>();
@@ -149,6 +149,26 @@ public static class MauiProgram
         else
         {
             throw new FileNotFoundException($"Resource {resourceName} not found.");
+        }
+    }
+    private static void CheckAndAddAnalyticsBeforeBuild(this MauiAppBuilder appBuilder)
+    {
+        var settings = appBuilder.Configuration.GetSection("Settings").Get<AppSettings>();
+        if (string.IsNullOrWhiteSpace(settings?.AptabaseKey) == false)
+        {
+            appBuilder.UseAptabase(settings.AptabaseKey);
+            appBuilder.Services.RegisterAnalyticsObservers(); // 👈 this is where we register the observers
+            appBuilder.Services.RegisterAnalyticsObservers(); // 👈 this is where we register the observers
+
+        }
+
+    }
+    private static void CheckAndAddAnalyticsAfterBuild(this MauiApp app)
+    {
+        var settings = app.Configuration.GetSection("Settings").Get<AppSettings>();
+        if (string.IsNullOrWhiteSpace(settings?.AptabaseKey) == false)
+        {
+            app.Services.ConfigureAnalyticsSubject(); // 👈 this is where we configure the subject
         }
     }
 }

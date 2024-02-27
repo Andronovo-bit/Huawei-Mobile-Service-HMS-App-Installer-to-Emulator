@@ -12,5 +12,6 @@ namespace HuaweiHMSInstaller.Models
         public string VersionNumber { get; set; }
         public string SponsorGameAppId { get; set; } = "C106234721"; //C104193349
         public string YoutuberChanneName { get; set; }
+        public string AptabaseKey { get; set; }
     }
 }

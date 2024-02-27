@@ -18,6 +18,7 @@ env:
   DOTNET_NOLOGO: true                     # Disable the .NET logo
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true # Disable the .NET first time experience
   DOTNET_CLI_TELEMETRY_OPTOUT: true       # Disable sending .NET CLI telemetry
+  APTABASE_KEY: ${{ secrets.APTABASE_KEY }} # Aptabase Key
 
 jobs:
 # MAUI Windows Build
@@ -39,6 +40,7 @@ jobs:
           $jsonContent = Get-Content -Path $pathToJson -Raw | ConvertFrom-Json
           $jsonContent.Settings.SponsorGameAppId = "${{ vars.GAME_ID }}"
           $jsonContent.Settings.YoutuberChanneName = "${{ vars.YOUTUBE_CHANNEL }}"
+          $jsonContent.Settings.AptabaseKey = "$env:APTABASE_KEY"
           $jsonContent | ConvertTo-Json -Depth 100 | Set-Content -Path $pathToJson
           $jsonContent
         shell: pwsh
