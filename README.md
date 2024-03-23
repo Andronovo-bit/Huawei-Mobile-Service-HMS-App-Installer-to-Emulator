@@ -2,6 +2,8 @@
 
 This project is a tool that allows you to install and run Android apps on the emulator along with Huawei Mobile Services (HMS) apps. The applications run depending on Appgallery.You can use this tool to test your apps that integrate with HMS APIs and services such as Push Kit, Location Kit, Analytics Kit, Ads Kit and more, or to install your desired appgallery app on your emulator.
 
+[![.NET MAUI CI for Windows](https://github.com/Andronovo-bit/Huawei-Mobile-Service-HMS-App-Installer-to-Emulator/actions/workflows/ci-build.yml/badge.svg)](https://github.com/Andronovo-bit/Huawei-Mobile-Service-HMS-App-Installer-to-Emulator/actions/workflows/ci-build.yml)
+
 ## Features
 
 - Download and install the latest ADB driver automatically
